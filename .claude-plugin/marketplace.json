@@ -1,0 +1,40 @@
+{
+  "name": "bazzite-ai-plugins",
+  "owner": {
+    "name": "atrawog"
+  },
+  "metadata": {
+    "description": "Claude Code plugins for Bazzite AI - OS features and development tools",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "bazzite-ai",
+      "source": "./bazzite-ai",
+      "description": "Skills for using Bazzite AI OS features via ujust commands",
+      "version": "1.0.0",
+      "author": {
+        "name": "atrawog"
+      },
+      "homepage": "https://bazzite.ai/",
+      "repository": "https://github.com/atrawog/bazzite-ai-plugins",
+      "license": "MIT",
+      "keywords": ["bazzite", "ai", "immutable-os", "ujust"],
+      "category": "productivity"
+    },
+    {
+      "name": "bazzite-ai-dev",
+      "source": "./bazzite-ai-dev",
+      "description": "Development tools and enforcement agents for Bazzite AI contributors",
+      "version": "1.0.0",
+      "author": {
+        "name": "atrawog"
+      },
+      "homepage": "https://bazzite.ai/",
+      "repository": "https://github.com/atrawog/bazzite-ai-plugins",
+      "license": "MIT",
+      "keywords": ["bazzite", "development", "testing", "enforcement"],
+      "category": "development"
+    }
+  ]
+}
