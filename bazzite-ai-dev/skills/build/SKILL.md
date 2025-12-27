@@ -1,189 +1,204 @@
 ---
 name: build
 description: |
-  Development: OS container image building with Podman. Builds the bazzite-ai
-  OCI image from Containerfile. Run from repository root with 'just build'.
-  Use when developers need to build or rebuild the OS image locally.
+  Development: Unified build system for OS images, pods, VMs, and ISOs.
+  Run from repository root with 'just build <subcommand>'. Includes smart
+  cache strategy that matches GitHub Actions for optimal build times.
 ---
 
-# Build - OS Image Building
+# Build - Unified Build System
 
 ## Overview
 
-The `build` command builds the bazzite-ai OS container image using Podman. It creates an OCI-compliant image from the Containerfile that can be deployed via rpm-ostree rebase or converted to VM/ISO formats.
+The `build` command provides a unified interface for all bazzite-ai build operations:
 
-**Key Concept:** This is a **development command** - run with `just` from the repository root, not `ujust`. It requires the bazzite-ai repository to be cloned.
+- OS container images
+- Pod container variants
+- VM images (QCOW2/RAW)
+- Live ISO installers
+
+**Smart Caching:** Automatically detects git branch and uses matching cache tag, ensuring local builds are compatible with GitHub Actions builds.
 
 ## Quick Reference
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Build default | `just build` | Build with default name and tag |
-| Build with tag | `just build bazzite-ai testing` | Build with custom tag |
-| Build and VM | `just rebuild-qcow2` | Build OS then create QCOW2 |
-| Build and ISO | `just rebuild-iso` | Build OS then create live ISO |
+| Build OS | `just build os` | Build OS container image |
+| Build pod | `just build pod nvidia` | Build specific pod variant |
+| Build all pods | `just build pod all` | Build all pod variants |
+| Build ISO | `just build iso` | Build live ISO installer |
+| Build QCOW2 | `just build qcow2` | Build QCOW2 VM image |
+| Build RAW | `just build raw` | Build RAW VM image |
+| Test pod | `just build test cuda` | Test CUDA functionality |
+| Test all | `just build test all` | Test all pod variants |
+| Generate lock | `just build pixi python` | Generate pixi.lock |
+| Show status | `just build status` | Show cache/build status |
 
-## Parameters
+## Pod Variants
 
-```bash
-just build [target_image] [tag]
-```
+| Variant | Image Name | Description |
+|---------|------------|-------------|
+| `base` | `bazzite-ai-pod` | CPU-only development |
+| `nvidia` | `bazzite-ai-pod-nvidia` | GPU compute with CUDA |
+| `nvidia-python` | `bazzite-ai-pod-nvidia-python` | NVIDIA + ML packages |
+| `jupyter` | `bazzite-ai-pod-jupyter` | JupyterLab + ML stack |
+| `ollama` | `bazzite-ai-pod-ollama` | LLM inference |
+| `devops` | `bazzite-ai-pod-devops` | AWS/kubectl/Helm tools |
+| `githubrunner` | `bazzite-ai-pod-githubrunner` | CI/CD pipeline |
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `target_image` | `bazzite-ai` | Image name |
-| `tag` | `43` | Image tag (Fedora version) |
+## Smart Cache Strategy
 
-## Build Process
+The build system automatically detects your git branch and uses the appropriate cache tag to maximize cache reuse between local and CI builds:
 
-The build command:
+| Branch | Cache Tag | Build Tag |
+|--------|-----------|-----------|
+| `main` | `stable` | `stable` |
+| `testing` | `testing` | `testing` |
+| Other | `{branch}` | `{branch}` |
 
-1. Sets version string: `${tag}-$(date +%Y%m%d)`
-2. Configures build arguments:
-   - `BASE_IMAGE`: `ghcr.io/ublue-os/bazzite-nvidia-open:stable`
-   - `IMAGE_NAME`: Target image name
-   - `IMAGE_VENDOR`: Repository organization
-   - `SHA_HEAD_SHORT`: Git commit SHA (if clean tree)
-3. Builds with Podman using `--pull=newer`
-
-## Build Arguments
-
-| Argument | Value | Description |
-|----------|-------|-------------|
-| `BASE_IMAGE` | `ghcr.io/ublue-os/bazzite-nvidia-open:stable` | Upstream Bazzite base |
-| `IMAGE_NAME` | `bazzite-ai` | Target image name |
-| `IMAGE_VENDOR` | `atrawog` | GitHub organization |
-| `SHA_HEAD_SHORT` | Git SHA | Only set if tree is clean |
+This ensures that when you build locally on the `testing` branch, you pull cache layers from the `:testing` images pushed by GitHub Actions.
 
 ## Common Workflows
 
-### Local Development Build
+### Build OS Image
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/atrawog/bazzite-ai.git
-cd bazzite-ai
+# Build with branch-appropriate tag
+just build os
 
-# 2. Build OS image
-just build
-
-# 3. Verify build
-podman images | grep bazzite-ai
+# Build with custom tag
+just build os custom-tag
 ```
 
-### Build with Custom Tag
+### Build Pods
 
 ```bash
-# Build testing version
-just build bazzite-ai testing
+# Interactive selection
+just build pod
 
-# Build specific version
-just build bazzite-ai 1.0.0
+# Specific variant
+just build pod nvidia
+
+# All variants
+just build pod all
 ```
 
-### Full Build Pipeline
+### Build VM/ISO
 
 ```bash
-# Build OS + create QCOW2 VM
-just rebuild-qcow2
+# Build QCOW2 VM image
+just build qcow2
 
-# Build OS + create live ISO
-just rebuild-iso
+# Build live ISO
+just build iso
 
-# Build OS + create all ISO variants
-just rebuild-iso-all
+# Build RAW image
+just build raw
 ```
 
-## Output
-
-The build creates a local container image:
-
-```
-localhost/bazzite-ai:43
-```
-
-View with:
+### Test Pods
 
 ```bash
-podman images | grep bazzite-ai
+# Test CUDA
+just build test cuda
+
+# Test DevOps tools
+just build test devops
+
+# All tests
+just build test all
+```
+
+### Generate Pixi Locks
+
+```bash
+# Python variant
+just build pixi python
+
+# Jupyter variant
+just build pixi jupyter
+
+# All variants
+just build pixi all
+```
+
+## Output Images
+
+Images are tagged with the registry prefix:
+
+```
+ghcr.io/atrawog/bazzite-ai:{tag}           # OS image
+ghcr.io/atrawog/bazzite-ai-pod:{tag}       # Base pod
+ghcr.io/atrawog/bazzite-ai-pod-nvidia:{tag} # NVIDIA pod
 ```
 
 ## Requirements
 
 - Podman installed and configured
 - Git repository cloned
-- Sufficient disk space (~10GB for build)
-- Network access (pulls base image)
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GITHUB_REPOSITORY_OWNER` | `atrawog` | Override organization |
-| `IMAGE_NAME` | `bazzite-ai` | Override image name |
-| `DEFAULT_TAG` | `43` | Override default tag |
+- Sufficient disk space (~10GB for OS, ~20GB for ISO)
+- Network access (pulls base images)
 
 ## Troubleshooting
 
-### Build Fails with Pull Error
+### Build Fails with Cache Error
 
-**Symptom:** Cannot pull base image
+**Symptom:** Cache layer not found
 
-**Cause:** Network issues or registry authentication
+**Cause:** Remote image not yet pushed for this branch
 
 **Fix:**
 
 ```bash
-# Check network
-curl -I https://ghcr.io
-
-# Re-authenticate if needed
-just gh-login
+# Build without cache (first build on new branch)
+# Or check status to see cache state
+just build status
 ```
 
-### Build Fails with Disk Space
+### Pod Build Fails with Base Image Missing
 
-**Symptom:** No space left on device
+**Symptom:** Cannot find base pod image
 
-**Cause:** Build cache or old images consuming space
+**Cause:** Parent variant not built
 
 **Fix:**
 
 ```bash
-# Clean up build artifacts
-just clean podman
-
-# Or full cleanup
-just clean all
+# Build in order (base -> nvidia -> jupyter)
+just build pod base
+just build pod nvidia
+just build pod jupyter
 ```
 
-### Image Not Tagged Correctly
+### CUDA Test Fails
 
-**Symptom:** Image has wrong tag or name
+**Symptom:** nvidia-smi not found
 
-**Cause:** Environment variables overriding defaults
+**Cause:** No GPU available or CDI not configured
 
 **Fix:**
 
 ```bash
-# Check environment
-echo $IMAGE_NAME $DEFAULT_TAG
+# Verify GPU on host
+nvidia-smi
 
-# Build with explicit values
-just build bazzite-ai 43
+# Check CDI configuration
+ls /etc/cdi/
 ```
 
 ## Cross-References
 
-- **Related Skills:** `vms` (VM/ISO from built image), `pods` (container pods)
-- **Next Steps:** `just build-qcow2` (VM image), `just build-iso` (live ISO)
+- **Related Skills:** `clean` (cleanup build artifacts), `gh` (registry auth)
+- **System Commands:** `ujust jupyter`, `ujust ollama` (use built pods)
 - **Documentation:** See `Containerfile` for image layers
 
 ## When to Use This Skill
 
 Use when the user asks about:
 
-- "build os image", "build bazzite-ai", "build container image"
-- "rebuild image", "local build", "development build"
-- "containerfile", "podman build", "oci image"
-- "just build" (specifically the development command)
+- "build os", "build image", "build container"
+- "build pod", "build nvidia", "build jupyter"
+- "build iso", "build qcow2", "build vm"
+- "test cuda", "test pod", "test devops"
+- "pixi lock", "generate lock"
+- "just build" (any build command)
