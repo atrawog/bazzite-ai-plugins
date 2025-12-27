@@ -16,6 +16,8 @@ The `build` command provides a unified interface for all bazzite-ai build operat
 - Pod container variants
 - VM images (QCOW2/RAW)
 - Live ISO installers
+- Push to registry
+- Sign with cosign
 
 **Smart Caching:** Automatically detects git branch and uses matching cache tag, ensuring local builds are compatible with GitHub Actions builds.
 
@@ -32,6 +34,10 @@ The `build` command provides a unified interface for all bazzite-ai build operat
 | Test pod | `just build test cuda` | Test CUDA functionality |
 | Test all | `just build test all` | Test all pod variants |
 | Generate lock | `just build pixi python` | Generate pixi.lock |
+| Push OS | `just build push os` | Push OS image to registry |
+| Push pod | `just build push pod nvidia` | Push pod to registry |
+| Sign OS | `just build sign os` | Sign OS image with cosign |
+| Sign pod | `just build sign pod nvidia` | Sign pod with cosign |
 | Show status | `just build status` | Show cache/build status |
 
 ## Pod Variants
@@ -43,6 +49,7 @@ The `build` command provides a unified interface for all bazzite-ai build operat
 | `nvidia-python` | `bazzite-ai-pod-nvidia-python` | NVIDIA + ML packages |
 | `jupyter` | `bazzite-ai-pod-jupyter` | JupyterLab + ML stack |
 | `ollama` | `bazzite-ai-pod-ollama` | LLM inference |
+| `comfyui` | `bazzite-ai-pod-comfyui` | Stable Diffusion UI |
 | `devops` | `bazzite-ai-pod-devops` | AWS/kubectl/Helm tools |
 | `githubrunner` | `bazzite-ai-pod-githubrunner` | CI/CD pipeline |
 
@@ -57,6 +64,17 @@ The build system automatically detects your git branch and uses the appropriate 
 | Other | `{branch}` | `{branch}` |
 
 This ensures that when you build locally on the `testing` branch, you pull cache layers from the `:testing` images pushed by GitHub Actions.
+
+## Environment Variables
+
+For CI integration, the following environment variables are supported:
+
+| Variable | Purpose |
+|----------|---------|
+| `COSIGN_PRIVATE_KEY` | Private key for signing with cosign |
+| `BUILD_LABELS` | Space-separated OCI labels to apply during build |
+| `BUILD_TAGS` | Space-separated tags to apply (overrides default) |
+| `BASE_IMAGE` | Override base image for pod builds (for digest pinning) |
 
 ## Common Workflows
 
@@ -109,6 +127,29 @@ just build test devops
 just build test all
 ```
 
+### Push to Registry
+
+```bash
+# Push OS image
+just build push os
+
+# Push specific pod
+just build push pod nvidia
+
+# Push all pods
+just build push pod all
+```
+
+### Sign Images
+
+```bash
+# Sign OS image (requires COSIGN_PRIVATE_KEY env var)
+COSIGN_PRIVATE_KEY=$KEY just build sign os
+
+# Sign pod
+COSIGN_PRIVATE_KEY=$KEY just build sign pod nvidia
+```
+
 ### Generate Pixi Locks
 
 ```bash
@@ -122,6 +163,28 @@ just build pixi jupyter
 just build pixi all
 ```
 
+## CI Integration
+
+The build commands are designed for GitHub Actions integration:
+
+```yaml
+# Build, push, and sign in CI
+- name: Build and push OS
+  env:
+    BUILD_LABELS: ${{ steps.metadata.outputs.labels }}
+    COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+  run: |
+    just build os $TAG
+    just build push os $TAG
+    just build sign os $TAG
+
+# Build pod with base image digest
+- name: Build nvidia pod
+  env:
+    BASE_IMAGE: ghcr.io/owner/bazzite-ai-pod@${{ needs.base.outputs.digest }}
+  run: just build pod nvidia $TAG
+```
+
 ## Output Images
 
 Images are tagged with the registry prefix:
@@ -130,6 +193,7 @@ Images are tagged with the registry prefix:
 ghcr.io/atrawog/bazzite-ai:{tag}           # OS image
 ghcr.io/atrawog/bazzite-ai-pod:{tag}       # Base pod
 ghcr.io/atrawog/bazzite-ai-pod-nvidia:{tag} # NVIDIA pod
+ghcr.io/atrawog/bazzite-ai-pod-comfyui:{tag} # ComfyUI pod
 ```
 
 ## Requirements
@@ -138,6 +202,8 @@ ghcr.io/atrawog/bazzite-ai-pod-nvidia:{tag} # NVIDIA pod
 - Git repository cloned
 - Sufficient disk space (~10GB for OS, ~20GB for ISO)
 - Network access (pulls base images)
+- cosign installed (for signing)
+- Registry authentication (for push)
 
 ## Troubleshooting
 
@@ -170,6 +236,35 @@ just build pod nvidia
 just build pod jupyter
 ```
 
+### Push Fails with Authentication Error
+
+**Symptom:** unauthorized: authentication required
+
+**Cause:** Not logged into registry
+
+**Fix:**
+
+```bash
+# Login to GitHub Container Registry
+podman login ghcr.io
+```
+
+### Sign Fails
+
+**Symptom:** cosign not found or key not set
+
+**Cause:** cosign not installed or COSIGN_PRIVATE_KEY not set
+
+**Fix:**
+
+```bash
+# Check cosign is installed
+which cosign
+
+# Set signing key
+export COSIGN_PRIVATE_KEY="$(cat cosign.key)"
+```
+
 ### CUDA Test Fails
 
 **Symptom:** nvidia-smi not found
@@ -188,7 +283,7 @@ ls /etc/cdi/
 
 ## Cross-References
 
-- **Related Skills:** `clean` (cleanup build artifacts), `gh` (registry auth)
+- **Related Skills:** `clean` (cleanup build artifacts)
 - **System Commands:** `ujust jupyter`, `ujust ollama` (use built pods)
 - **Documentation:** See `Containerfile` for image layers
 
@@ -197,8 +292,10 @@ ls /etc/cdi/
 Use when the user asks about:
 
 - "build os", "build image", "build container"
-- "build pod", "build nvidia", "build jupyter"
+- "build pod", "build nvidia", "build jupyter", "build comfyui"
 - "build iso", "build qcow2", "build vm"
 - "test cuda", "test pod", "test devops"
+- "push os", "push pod", "push to registry"
+- "sign image", "cosign", "sign pod"
 - "pixi lock", "generate lock"
 - "just build" (any build command)
