@@ -1,0 +1,9 @@
+{
+  "name": "bazzite",
+  "description": "Skills for using Bazzite OS features via ujust commands",
+  "version": "1.0.0",
+  "author": {
+    "name": "atrawog"
+  },
+  "repository": "https://github.com/atrawog/bazzite-ai-plugins"
+}

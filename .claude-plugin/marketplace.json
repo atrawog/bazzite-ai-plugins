@@ -9,6 +9,20 @@
   },
   "plugins": [
     {
+      "name": "bazzite",
+      "source": "./bazzite",
+      "description": "Skills for using Bazzite OS features via ujust commands",
+      "version": "1.0.0",
+      "author": {
+        "name": "atrawog"
+      },
+      "homepage": "https://bazzite.gg/",
+      "repository": "https://github.com/atrawog/bazzite-ai-plugins",
+      "license": "MIT",
+      "keywords": ["bazzite", "gaming", "immutable-os", "ujust"],
+      "category": "productivity"
+    },
+    {
       "name": "bazzite-ai",
       "source": "./bazzite-ai",
       "description": "Skills for using Bazzite AI OS features via ujust commands",
