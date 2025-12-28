@@ -12,8 +12,6 @@ description: |
 
 LangChain is a framework for building LLM applications. It provides abstractions for prompts, models, chains, and output parsing that work with both local models (HuggingFace, Ollama) and cloud APIs (OpenAI, Anthropic).
 
-**Reference Notebooks:** D1_01, D1_02, D1_05
-
 ## Quick Reference
 
 | Component | Purpose |
@@ -292,6 +290,7 @@ response = chat_llm.invoke(messages)
 ## When to Use This Skill
 
 Use when:
+
 - Building LLM applications with structured workflows
 - Need prompt templating and variable substitution
 - Chaining multiple LLM calls together

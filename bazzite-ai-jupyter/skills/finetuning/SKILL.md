@@ -12,8 +12,6 @@ description: |
 
 Fine-tuning adapts a pre-trained LLM to specific tasks by training on task-specific data. This skill covers both manual PyTorch training and HuggingFace's high-level Trainer API.
 
-**Reference Notebooks:** D3_02, D3_03
-
 ## Quick Reference
 
 | Approach | Use Case |
@@ -404,6 +402,7 @@ trainer.train(resume_from_checkpoint="./checkpoint")
 ## When to Use This Skill
 
 Use when:
+
 - Adapting LLM to specific domain/task
 - Improving model performance on your data
 - Creating instruction-following models

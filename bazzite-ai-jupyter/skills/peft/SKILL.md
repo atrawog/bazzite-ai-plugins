@@ -12,8 +12,6 @@ description: |
 
 PEFT methods like LoRA train only a small number of adapter parameters instead of the full model, reducing memory by 10-100x while maintaining quality.
 
-**Reference Notebooks:** D3_05, D3_06
-
 ## Quick Reference
 
 | Method | Memory | Speed | Quality |
@@ -52,12 +50,6 @@ print(f"Memory reduction: {lora_savings(4096, 4096, 8):.1f}%")
 ```
 
 ## Basic LoRA Setup
-
-### Install PEFT
-
-```python
-# pip install peft
-```
 
 ### Configure LoRA
 
@@ -205,12 +197,6 @@ trainer.train()
 
 ## Unsloth (2x Faster Training)
 
-### Install
-
-```python
-# pip install unsloth
-```
-
 ### Setup
 
 ```python
@@ -337,6 +323,7 @@ print(tokenizer.decode(outputs[0]))
 ### Out of Memory
 
 **Fix:**
+
 ```python
 # Use gradient checkpointing
 model.gradient_checkpointing_enable()
@@ -349,6 +336,7 @@ gradient_accumulation_steps=8
 ### Poor Quality
 
 **Fix:**
+
 - Increase `r` (rank)
 - Add more target modules
 - Train longer
@@ -357,6 +345,7 @@ gradient_accumulation_steps=8
 ### NaN Loss
 
 **Fix:**
+
 - Lower learning rate
 - Use gradient clipping
 - Check for data issues
@@ -364,6 +353,7 @@ gradient_accumulation_steps=8
 ## When to Use This Skill
 
 Use when:
+
 - GPU memory is limited
 - Fine-tuning large models (7B+)
 - Need fast training iterations

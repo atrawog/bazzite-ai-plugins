@@ -12,8 +12,6 @@ description: |
 
 The Transformer architecture is the foundation of modern LLMs. Understanding its components helps with fine-tuning decisions, model selection, and debugging performance issues.
 
-**Reference Notebook:** D3_01
-
 ## Quick Reference
 
 | Component | Purpose |
@@ -83,6 +81,7 @@ Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) V
 ```
 
 Where:
+
 - Q = Query matrix
 - K = Key matrix
 - V = Value matrix
@@ -303,6 +302,7 @@ print(f"Estimated parameters: {params_b:.1f}B")
 ## When to Use This Skill
 
 Use when:
+
 - Understanding model architecture for fine-tuning
 - Debugging attention patterns
 - Selecting target modules for LoRA

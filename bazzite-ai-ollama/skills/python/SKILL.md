@@ -12,8 +12,6 @@ description: |
 
 The official `ollama` Python library provides a clean, Pythonic interface to all Ollama functionality. It automatically connects to the Ollama server and handles serialization.
 
-**Installation:** `pip install ollama`
-
 ## Quick Reference
 
 | Function | Purpose |
@@ -260,6 +258,7 @@ print(conv.chat("What are its main features?"))
 ## When to Use This Skill
 
 Use when:
+
 - You want a clean, Pythonic interface
 - Building Python applications
 - Need IDE autocompletion support

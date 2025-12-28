@@ -12,8 +12,6 @@ description: |
 
 Quantization reduces model precision to save memory and speed up inference. A 7B model at FP32 requires ~28GB, but at 4-bit only ~4GB.
 
-**Reference Notebook:** D3_04
-
 ## Quick Reference
 
 | Precision | Bits | Memory | Quality | Speed |
@@ -248,6 +246,7 @@ model = get_peft_model(model, lora_config)
 **Symptom:** CUDA OOM error
 
 **Fix:**
+
 ```python
 # Use 4-bit quantization
 config = BitsAndBytesConfig(
@@ -261,6 +260,7 @@ config = BitsAndBytesConfig(
 **Symptom:** Poor model outputs after quantization
 
 **Fix:**
+
 - Use nf4 instead of fp4
 - Try 8-bit instead of 4-bit
 - Increase LoRA rank if fine-tuning
@@ -270,12 +270,14 @@ config = BitsAndBytesConfig(
 **Symptom:** Model takes long to load
 
 **Fix:**
+
 - Quantization happens at load time
 - Use `device_map="auto"` for multi-GPU
 
 ## When to Use This Skill
 
 Use when:
+
 - Model doesn't fit in GPU memory
 - Need faster inference
 - Training with limited resources (QLoRA)

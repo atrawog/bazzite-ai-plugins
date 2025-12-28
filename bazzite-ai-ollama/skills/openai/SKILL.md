@@ -16,8 +16,6 @@ Ollama provides an OpenAI-compatible API at `/v1/*` endpoints. This allows using
 - **Tool ecosystem** - Works with LangChain, LlamaIndex, etc.
 - **Familiar interface** - Standard OpenAI patterns
 
-**Installation:** `pip install openai`
-
 ## Quick Reference
 
 | Endpoint | Method | Purpose |
@@ -30,6 +28,7 @@ Ollama provides an OpenAI-compatible API at `/v1/*` endpoints. This allows using
 ### Limitations
 
 The OpenAI compatibility layer does **not** support:
+
 - Show model details (`/api/show`)
 - List running models (`/api/ps`)
 - Copy model (`/api/copy`)
@@ -246,6 +245,7 @@ server_ok, model_ok = check_ollama_health()
 ## When to Use This Skill
 
 Use when:
+
 - Migrating from OpenAI to local LLMs
 - Using LangChain, LlamaIndex, or other OpenAI-based tools
 - You prefer the OpenAI client interface

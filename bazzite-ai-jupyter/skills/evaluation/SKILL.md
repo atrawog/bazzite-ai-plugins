@@ -12,10 +12,6 @@ description: |
 
 Evidently.ai provides tools for evaluating LLM outputs using descriptors (row-level metrics) and reports. It supports automated prompt optimization and LLM-as-a-Judge patterns for quality assessment.
 
-**Installation:** `pip install evidently[llm]`
-
-**Reference Notebooks:** D1_08, D1_09, D1_10
-
 ## Quick Reference
 
 | Component | Purpose |
@@ -297,6 +293,7 @@ print("Model B average score:", model_b_dataset.as_dataframe()["quality"].mean()
 **Symptom:** Evaluation takes too long
 
 **Fix:**
+
 - Reduce dataset size for initial testing
 - Use smaller/faster judge model
 - Batch requests where possible
@@ -306,6 +303,7 @@ print("Model B average score:", model_b_dataset.as_dataframe()["quality"].mean()
 **Symptom:** LLM judge gives inconsistent scores
 
 **Fix:**
+
 - Lower temperature (0.0-0.3)
 - Make prompt more specific
 - Add examples to prompt
@@ -316,6 +314,7 @@ print("Model B average score:", model_b_dataset.as_dataframe()["quality"].mean()
 **Symptom:** Prompt optimization stuck
 
 **Fix:**
+
 - Increase `max_iterations`
 - Try different initial prompts
 - Check ground truth labels are correct
@@ -324,6 +323,7 @@ print("Model B average score:", model_b_dataset.as_dataframe()["quality"].mean()
 ## When to Use This Skill
 
 Use when:
+
 - Measuring LLM output quality
 - Comparing different prompts
 - Automating prompt engineering

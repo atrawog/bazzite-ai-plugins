@@ -12,8 +12,6 @@ description: |
 
 RAG enhances LLM responses by retrieving relevant context from a knowledge base before generation. This grounds responses in specific documents and reduces hallucination.
 
-**Reference Notebooks:** D2_01, D2_02
-
 ## Quick Reference
 
 | Step | Component |
@@ -303,6 +301,7 @@ vectorstore.save_local("./faiss_index")
 **Symptom:** Retrieved chunks not relevant
 
 **Fix:**
+
 - Increase chunk overlap
 - Use smaller chunk sizes
 - Try different embedding models
@@ -313,6 +312,7 @@ vectorstore.save_local("./faiss_index")
 **Symptom:** Takes long to embed documents
 
 **Fix:**
+
 - Batch embeddings
 - Use smaller embedding model
 - Cache embeddings to disk
@@ -322,6 +322,7 @@ vectorstore.save_local("./faiss_index")
 **Symptom:** LLM ignores retrieved context
 
 **Fix:**
+
 - Increase `max_tokens`
 - Use explicit system prompt
 - Reduce number of retrieved chunks
@@ -329,6 +330,7 @@ vectorstore.save_local("./faiss_index")
 ## When to Use This Skill
 
 Use when:
+
 - LLM needs to answer from specific documents
 - Reducing hallucination is critical
 - Building Q&A systems over documents

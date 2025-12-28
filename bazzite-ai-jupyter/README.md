@@ -23,23 +23,22 @@ This plugin provides skills for **ML/AI workflows** in JupyterLab.
 ## Prerequisites
 
 **JupyterLab Environment:**
+
 - JupyterLab server running (default: `http://localhost:8888` or configured Jupyter URL)
 - GPU access configured if using GPU-accelerated training
 
 **Ollama (for inference):**
+
 - Ollama server running (default: `http://ollama:11434` or `OLLAMA_HOST` env var)
 - Model available (pull via API):
+
 ```python
 import requests
 OLLAMA_HOST = "http://ollama:11434"
 requests.post(f"{OLLAMA_HOST}/api/pull", json={"name": "hf.co/NousResearch/Nous-Hermes-2-Mistral-7B-DPO-GGUF:Q4_K_M"}, stream=True)
 ```
 
-**Python Packages:**
-```bash
-pip install langchain langchain-openai langchain-huggingface langchain-community
-pip install chromadb evidently transformers datasets peft bitsandbytes
-```
+**Note:** All required Python packages are pre-installed in the `bazzite-ai-pod-jupyter` container.
 
 ## Quick Start
 
