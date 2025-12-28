@@ -49,6 +49,34 @@
       "license": "MIT",
       "keywords": ["bazzite", "development", "testing", "enforcement"],
       "category": "development"
+    },
+    {
+      "name": "bazzite-ai-jupyter",
+      "source": "./bazzite-ai-jupyter",
+      "description": "ML/AI development workflows for JupyterLab - LangChain, RAG, fine-tuning, and model optimization",
+      "version": "1.0.0",
+      "author": {
+        "name": "atrawog"
+      },
+      "homepage": "https://bazzite.ai/",
+      "repository": "https://github.com/atrawog/bazzite-ai",
+      "license": "MIT",
+      "keywords": ["jupyter", "langchain", "rag", "fine-tuning", "ml"],
+      "category": "development"
+    },
+    {
+      "name": "bazzite-ai-ollama",
+      "source": "./bazzite-ai-ollama",
+      "description": "Ollama API operations for LLM inference, embeddings, and model management",
+      "version": "1.0.0",
+      "author": {
+        "name": "atrawog"
+      },
+      "homepage": "https://bazzite.ai/",
+      "repository": "https://github.com/atrawog/bazzite-ai",
+      "license": "MIT",
+      "keywords": ["ollama", "llm", "inference", "embeddings"],
+      "category": "development"
     }
   ]
 }
