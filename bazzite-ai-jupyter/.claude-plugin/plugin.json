@@ -1,0 +1,9 @@
+{
+  "name": "bazzite-ai-jupyter",
+  "description": "ML/AI development workflows for JupyterLab - LangChain, RAG, fine-tuning, and model optimization",
+  "version": "1.0.0",
+  "author": {
+    "name": "atrawog"
+  },
+  "repository": "https://github.com/atrawog/bazzite-ai"
+}

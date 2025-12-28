@@ -188,7 +188,7 @@ try:
         if "error" in result:
             print(f"API Error: {result['error']}")
 except requests.exceptions.ConnectionError:
-    print("Cannot connect to Ollama. Run: ujust ollama start")
+    print("Cannot connect to Ollama. Ensure server is running at OLLAMA_HOST")
 except requests.exceptions.Timeout:
     print("Request timed out")
 ```
@@ -241,4 +241,3 @@ Use when:
 
 - `bazzite-ai-ollama:python` - Higher-level Python library
 - `bazzite-ai-ollama:openai` - OpenAI-compatible interface
-- `bazzite-ai:ollama` - Server management

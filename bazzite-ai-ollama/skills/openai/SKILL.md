@@ -255,4 +255,3 @@ Use when:
 
 - `bazzite-ai-ollama:python` - Native Ollama library (more features)
 - `bazzite-ai-ollama:api` - Direct REST API access
-- `bazzite-ai:ollama` - Server management

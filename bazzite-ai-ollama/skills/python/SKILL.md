@@ -201,7 +201,7 @@ try:
     models = ollama.list()
     print("Ollama server is running!")
 except Exception as e:
-    print("Cannot connect to Ollama. Run: ujust ollama start")
+    print("Cannot connect to Ollama. Ensure server is running at OLLAMA_HOST")
 ```
 
 ## Connection Health Check
@@ -270,4 +270,3 @@ Use when:
 
 - `bazzite-ai-ollama:api` - Direct REST API access
 - `bazzite-ai-ollama:openai` - OpenAI-compatible interface
-- `bazzite-ai:ollama` - Server management

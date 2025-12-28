@@ -290,21 +290,18 @@ complete_gpu_health_check()
 
 **Check:**
 
-```python
-# Check Ollama server config
-ujust ollama status
-
-# Check GPU inside container
-ujust ollama shell "nvidia-smi"
+```bash
+# Check GPU inside container (adjust container name as needed)
+docker exec -it ollama nvidia-smi
+# or
+podman exec -it ollama nvidia-smi
 ```
 
 **Fix:**
 
 ```bash
-# Reconfigure with explicit GPU
-ujust ollama delete
-ujust ollama config 11434 nvidia
-ujust ollama start
+# Restart Ollama container with GPU access
+# Refer to bazzite-ai-pod-ollama documentation for container setup
 ```
 
 ### Out of Memory
@@ -313,9 +310,19 @@ ujust ollama start
 
 **Fix:**
 
-```bash
-# Use smaller/quantized model
-ujust ollama pull llama3.2:7b-q4_0
+```python
+# Use smaller/quantized model via API
+import requests
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+
+response = requests.post(
+    f"{OLLAMA_HOST}/api/pull",
+    json={"name": "llama3.2:7b-q4_0"},
+    stream=True
+)
+for line in response.iter_lines():
+    if line:
+        print(line.decode())
 ```
 
 ### Slow Inference
@@ -346,6 +353,5 @@ Use when:
 
 ## Cross-References
 
-- `bazzite-ai:ollama` - Server configuration
-- `bazzite-ai:configure` - GPU container setup
 - `bazzite-ai-ollama:api` - API for running inference
+- `bazzite-ai-ollama:python` - Python library for inference

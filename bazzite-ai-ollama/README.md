@@ -6,7 +6,7 @@ Ollama API operations for LLM inference, embeddings, and model management.
 
 This plugin provides skills for **API-level Ollama operations** - using Python libraries and REST APIs to interact with Ollama for inference, embeddings, and model management.
 
-**Note:** For server management (start/stop/config), see `bazzite-ai:ollama`.
+This plugin is designed to work with the `bazzite-ai-pod-ollama` container or any Ollama server.
 
 ## Skills
 
@@ -20,8 +20,8 @@ This plugin provides skills for **API-level Ollama operations** - using Python l
 
 ## Prerequisites
 
-- Ollama server running: `ujust ollama start`
-- Model pulled: `ujust ollama pull llama3.2`
+- Ollama server running (default: `http://localhost:11434` or `OLLAMA_HOST` env var)
+- Model available (pull via API: `POST /api/pull` with `{"name": "llama3.2:latest"}`)
 
 ## Quick Start
 
@@ -40,8 +40,6 @@ response = ollama.chat(
 print(response["message"]["content"])
 ```
 
-## Related Skills
+## Related Plugins
 
-- `bazzite-ai:ollama` - Server management via ujust commands
-- `bazzite-ai:jupyter` - ML development environment
-- `bazzite-ai:configure` - GPU container setup
+- `bazzite-ai-jupyter` - ML/AI development workflows (if running bazzite-ai-pod-jupyter)

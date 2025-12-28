@@ -273,4 +273,3 @@ Use when:
 
 - `bazzite-ai-ollama:python` - Using imported models
 - `bazzite-ai-ollama:api` - REST API for model management
-- `bazzite-ai:ollama` - Server management
