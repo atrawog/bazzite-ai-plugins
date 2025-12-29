@@ -6,5 +6,5 @@
     "name": "atrawog"
   },
   "repository": "https://github.com/atrawog/bazzite-ai",
-  "mcpServers": "../.mcp.json"
+  "mcpServers": "./.mcp.json"
 }
