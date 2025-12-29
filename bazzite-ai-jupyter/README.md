@@ -6,6 +6,17 @@ ML/AI development workflows for JupyterLab - LangChain, RAG, fine-tuning, and mo
 
 This plugin provides skills for **ML/AI workflows** in JupyterLab.
 
+## MCP Server
+
+This plugin includes a Jupyter MCP server that connects to a running JupyterLab instance.
+
+**Configuration:**
+
+- URL: `http://127.0.0.1:8888/mcp`
+- Type: HTTP-based MCP server
+
+**Prerequisite:** JupyterLab must be running with MCP support enabled (via `ujust jupyter start`).
+
 **Note:** This plugin is designed to work with the `bazzite-ai-pod-jupyter` container or any JupyterLab environment with the required packages. For Ollama API operations, see `bazzite-ai-ollama`.
 
 ## Skills
