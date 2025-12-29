@@ -20,11 +20,31 @@ This plugin provides skills for **ML/AI workflows** in JupyterLab.
 | `quantization` | Model quantization for efficient inference |
 | `peft` | Parameter-efficient fine-tuning (LoRA, Unsloth) |
 
+## MCP Server
+
+This plugin bundles a **Jupyter MCP server** that connects to your running JupyterLab instance.
+
+**Connection:** `http://127.0.0.1:8888/mcp`
+
+**Available tools:**
+
+| Tool | Description |
+|------|-------------|
+| `mcp__jupyter__list_files` | List files in Jupyter server filesystem |
+| `mcp__jupyter__list_kernels` | List available kernels |
+| `mcp__jupyter__use_notebook` | Activate a notebook for operations |
+| `mcp__jupyter__read_notebook` | Read notebook cells and structure |
+| `mcp__jupyter__insert_cell` | Insert new cells |
+| `mcp__jupyter__execute_cell` | Execute notebook cells |
+| `mcp__jupyter__execute_code` | Execute code directly in kernel |
+
+The MCP server starts automatically when this plugin is enabled.
+
 ## Prerequisites
 
 **JupyterLab Environment:**
 
-- JupyterLab server running (default: `http://localhost:8888` or configured Jupyter URL)
+- JupyterLab server running at `http://localhost:8888` with MCP enabled
 - GPU access configured if using GPU-accelerated training
 
 **Ollama (for inference):**
