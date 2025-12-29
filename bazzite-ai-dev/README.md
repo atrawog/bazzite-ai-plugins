@@ -8,6 +8,24 @@ This plugin provides:
 
 1. **Development skills** for building, testing, and maintaining Bazzite AI
 2. **Enforcement agents** that ensure code quality and policy compliance
+3. **GitHub MCP integration** for repository operations
+
+## MCP Server
+
+This plugin includes a GitHub MCP server for repository operations.
+
+**Tools available:**
+
+- Issues: `issue_read`, `issue_write`, `add_issue_comment`, `list_issues`, `search_issues`
+- Pull requests: `pull_request_read`, `list_pull_requests`, `search_pull_requests`
+- Workflows: `list_workflows`, `list_workflow_runs`, `get_workflow_run`, `get_job_logs`
+- Repository: `get_file_contents`, `list_commits`, `get_commit`, `list_branches`
+- Labels: `get_label`, `list_label`, `label_write`
+
+**Prerequisites:**
+
+- `github-mcp-server` available via direnv (installed in project)
+- `GITHUB_TOKEN` environment variable set
 
 ## Available Skills
 
