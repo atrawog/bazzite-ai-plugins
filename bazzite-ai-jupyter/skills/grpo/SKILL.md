@@ -19,14 +19,22 @@ GRPO is a reinforcement learning method for LLM alignment. It generates multiple
 | `GRPOTrainer` | RL trainer for policy optimization |
 | `GRPOConfig` | Training hyperparameters |
 | `reward_funcs` | Reward function(s) for scoring |
+| `completion_ids` | Token IDs passed to reward functions (no re-tokenization) |
 | `beta` | KL penalty coefficient (0.1 typical) |
 | `num_generations` | Completions per prompt (2-4) |
 | `learning_rate` | 1e-5 (10x lower than SFT) |
+| Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
 
 ## Critical Environment Setup
 
 ```python
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Force text-based progress in Jupyter
+os.environ["TQDM_NOTEBOOK"] = "false"
+
 # CRITICAL: Set BEFORE importing unsloth/TRL
 os.environ['ACCELERATE_MIXED_PRECISION'] = 'bf16'
 ```
@@ -42,7 +50,6 @@ from unsloth import FastLanguageModel, is_bf16_supported
 from trl import GRPOConfig, GRPOTrainer
 from datasets import Dataset
 import torch
-import re
 ```
 
 **Warning**: Setting `ACCELERATE_MIXED_PRECISION` after imports may cause training issues.
@@ -179,99 +186,108 @@ def combined_reward(completions, prompts):
     return [0.5 * l + 0.5 * f for l, f in zip(length_scores, format_scores)]
 ```
 
-### Thinking-Aware Reward Function
+### Thinking-Aware Reward Function (Token-Based)
 
-Reward quality of `<think>` tags for thinking models:
+Use `completion_ids` parameter from TRL for efficient token-based parsing:
 
 ```python
-import re
+THINK_END_TOKEN_ID = 151668  # </think> token for Qwen3-Thinking models
 
-def thinking_reward_fn(completions, prompts=None, **kwargs):
+def thinking_reward_fn(completions, prompts=None, completion_ids=None, **kwargs):
     """
-    Evaluate thinking quality in completions.
+    Token-based reward function using completion_ids provided by TRL.
+
+    Benefits over string matching:
+    - No re-tokenization overhead (faster training)
+    - Exact token boundaries (no regex edge cases)
+    - Consistent with inference code pattern
 
     Scoring:
-    - No thinking tags: -1.0 (strongly penalized)
-    - Short thinking (<10 words): 0.3
-    - Medium thinking (10-30 words): 0.7
-    - Long thinking (>30 words): 1.0
+    - No </think> token: -1.0 (strongly penalized)
+    - Short thinking (<10 tokens): 0.3
+    - Medium thinking (10-30 tokens): 0.7
+    - Long thinking (>30 tokens): 1.0
     - Bonus +0.1 for self-questioning (contains '?')
     """
     rewards = []
-    for completion in completions:
-        has_thinking = "<think>" in completion or "</think>" in completion
 
-        if has_thinking:
-            # Extract thinking content
-            think_match = re.search(r'<think>(.*?)</think>', completion, re.DOTALL)
-            thinking_content = think_match.group(1) if think_match else ""
+    for completion, comp_ids in zip(completions, completion_ids):
+        # Token-based detection using </think> token ID
+        if THINK_END_TOKEN_ID in comp_ids:
+            end_idx = comp_ids.index(THINK_END_TOKEN_ID)
+            thinking_length = end_idx  # Token count before </think>
 
-            # Count thinking words
-            thinking_words = len(thinking_content.split())
+            # String-based content analysis for question detection
+            thinking_content = completion.split('</think>')[0]
+            has_self_questions = '?' in thinking_content
 
-            # Check for self-questioning (good thinking pattern)
-            question_marks = thinking_content.count('?')
-            has_self_questions = question_marks >= 1
-
-            # Score based on thinking depth
-            if thinking_words < 10:
-                reward = 0.3  # Too shallow
-            elif thinking_words < 30:
+            # Score based on thinking token count
+            if thinking_length < 10:
+                reward = 0.3  # Minimal thinking
+            elif thinking_length < 30:
                 reward = 0.7 + (0.1 if has_self_questions else 0)
             else:
                 reward = 1.0 + (0.1 if has_self_questions else 0)
         else:
-            reward = -1.0  # No thinking at all
+            reward = -1.0  # No </think> token found
 
         rewards.append(reward)
 
     return rewards
 ```
 
-### Multi-Objective Thinking Reward
+**Key insight**: TRL passes `completion_ids` directly to reward functions, eliminating re-tokenization overhead.
+
+### Multi-Objective Thinking Reward (Token-Based)
 
 ```python
-def comprehensive_thinking_reward(completions, prompts=None, **kwargs):
-    """Evaluate multiple aspects of thinking quality."""
+THINK_END_TOKEN_ID = 151668  # </think> token for Qwen3-Thinking models
+
+def comprehensive_thinking_reward(completions, prompts=None, completion_ids=None, **kwargs):
+    """
+    Evaluate multiple aspects of thinking quality using token IDs.
+
+    Scoring breakdown:
+    - Has </think> token: +0.3
+    - Thinking depth (20+ tokens): +0.3
+    - Structured sentences: +0.2
+    - Self-questioning: +0.1
+    - Step-by-step reasoning: +0.1
+    """
     rewards = []
 
-    for completion in completions:
+    for completion, comp_ids in zip(completions, completion_ids):
         score = 0.0
 
-        # Check for thinking tags
-        has_think_open = "<think>" in completion
-        has_think_close = "</think>" in completion
+        # Token-based boundary detection
+        if THINK_END_TOKEN_ID in comp_ids:
+            score += 0.3  # Has proper </think> token
+            end_idx = comp_ids.index(THINK_END_TOKEN_ID)
+            thinking_length = end_idx  # Token count
 
-        if has_think_open and has_think_close:
-            score += 0.3  # Has proper tags
+            # Extract thinking content for text analysis
+            thinking = completion.split('</think>')[0]
 
-            # Extract and analyze thinking
-            match = re.search(r'<think>(.*?)</think>', completion, re.DOTALL)
-            if match:
-                thinking = match.group(1)
+            # Depth (token count from IDs)
+            if thinking_length >= 20:
+                score += 0.3
+            elif thinking_length >= 10:
+                score += 0.2
 
-                # Depth (word count)
-                words = len(thinking.split())
-                if words >= 20:
-                    score += 0.3
-                elif words >= 10:
-                    score += 0.2
+            # Structure (sentences in text)
+            sentences = thinking.count('.') + thinking.count('!')
+            if sentences >= 2:
+                score += 0.2
 
-                # Structure (sentences)
-                sentences = thinking.count('.') + thinking.count('!')
-                if sentences >= 2:
-                    score += 0.2
+            # Self-questioning
+            if '?' in thinking:
+                score += 0.1
 
-                # Self-questioning
-                if '?' in thinking:
-                    score += 0.1
-
-                # Step-by-step reasoning
-                if any(w in thinking.lower() for w in ['first', 'then', 'next', 'finally']):
-                    score += 0.1
-
+            # Step-by-step reasoning
+            if any(w in thinking.lower() for w in ['first', 'then', 'next', 'finally']):
+                score += 0.1
         else:
-            score = -0.5  # Penalize missing thinking
+            score = -0.5  # Penalize missing </think> token
 
         rewards.append(score)
 
@@ -377,6 +393,19 @@ trainer = GRPOTrainer(
 - Reduce `num_generations` to 2
 - Use gradient checkpointing
 - Reduce `max_completion_length`
+
+## Kernel Shutdown (Jupyter)
+
+GRPO training uses significant GPU memory. Shutdown kernel to release memory:
+
+```python
+import IPython
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
+```
+
+**Important**: Always run this at the end of training notebooks before switching to different models.
 
 ## When to Use This Skill
 

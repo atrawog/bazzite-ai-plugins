@@ -22,6 +22,17 @@ SFT adapts a pre-trained LLM to follow instructions by training on instruction-r
 | `dataset_text_field` | Column containing formatted text |
 | Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
 
+## Critical Environment Setup
+
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Force text-based progress in Jupyter
+os.environ["TQDM_NOTEBOOK"] = "false"
+```
+
 ## Critical Import Order
 
 ```python
@@ -76,7 +87,7 @@ dataset = dataset.map(format_conversation)
 
 ### Thinking Model Format
 
-For models like Qwen3-Thinking, include `<think>` tags in the assistant response:
+For models like Qwen3-Thinking, include `<think>` tags in the assistant response. Use **self-questioning internal dialogue** style:
 
 ```python
 def format_thinking_conversation(sample):
@@ -92,23 +103,34 @@ def format_thinking_conversation(sample):
         messages, tokenize=False, add_generation_prompt=False
     )}
 
-# Sample dataset with thinking
+# Sample dataset with self-questioning thinking style
 thinking_data = [
     {
-        "instruction": "What is 15 + 27?",
-        "thinking": "I need to add 15 and 27. Let me break it down: 15 + 27 = 15 + 20 + 7 = 35 + 7 = 42.",
-        "response": "15 + 27 = 42"
+        "instruction": "What is machine learning?",
+        "thinking": "What is the user asking here? They want to understand machine learning. What are the key concepts I should cover? It's a subset of AI... and it involves learning from data. How should I keep this accessible? Short and clear definition.",
+        "response": "Machine learning is a subset of artificial intelligence where computers learn patterns from data."
     },
     {
-        "instruction": "Explain recursion in programming.",
-        "thinking": "What is recursion? It's when a function calls itself. Why would we do this? To solve problems that can be broken into smaller, similar subproblems. What's a good example? Calculating factorial: n! = n * (n-1)!",
-        "response": "Recursion is when a function calls itself to solve a problem by breaking it into smaller, similar subproblems. For example, factorial: n! = n * (n-1)!"
+        "instruction": "Explain Python in one sentence.",
+        "thinking": "One sentence only - what's most important about Python? Its readability and versatility are the defining features. How do I capture both in one sentence?",
+        "response": "Python is a high-level programming language known for its readability and versatility."
+    },
+    {
+        "instruction": "What is a neural network?",
+        "thinking": "How do I explain neural networks simply? What's the core concept? They're inspired by biological neurons... they process information in layers. Should I mention deep learning? Maybe keep it basic for now.",
+        "response": "A neural network is a computational model inspired by biological neurons that processes information through connected layers."
     },
 ]
 
 dataset = Dataset.from_list(thinking_data)
-dataset = dataset.map(format_thinking_conversation)
+dataset = dataset.map(format_thinking_conversation, remove_columns=["instruction", "thinking", "response"])
 ```
+
+**Thinking Style Patterns:**
+- "What is the user asking here?"
+- "Let me think about the key concepts..."
+- "How should I structure this explanation?"
+- "What's most important about X?"
 
 ## Unsloth SFT Setup
 
@@ -329,6 +351,19 @@ ollama run mymodel
 - Ensure Unsloth is imported FIRST (before TRL)
 - Use `bf16=True` if supported
 - Enable `use_gradient_checkpointing="unsloth"`
+
+## Kernel Shutdown (Jupyter)
+
+SFT training uses significant GPU memory. Shutdown kernel to release memory:
+
+```python
+import IPython
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
+```
+
+**Important**: Always run this at the end of training notebooks before switching to different models.
 
 ## When to Use This Skill
 

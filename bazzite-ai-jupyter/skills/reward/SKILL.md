@@ -21,6 +21,18 @@ Reward models learn to score responses based on human preferences. They're used 
 | `AutoModelForSequenceClassification` | Model with `num_labels=1` |
 | `task_type="SEQ_CLS"` | LoRA task type for reward models |
 | Preference pairs | Training data format |
+| Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
+
+## Critical Environment Setup
+
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Force text-based progress in Jupyter
+os.environ["TQDM_NOTEBOOK"] = "false"
+```
 
 ## Critical Import Order
 
@@ -317,6 +329,19 @@ def clipped_reward(completions, prompts):
 - Use LoRA instead of full fine-tuning
 - Reduce `max_length`
 - Smaller batch size
+
+## Kernel Shutdown (Jupyter)
+
+Reward model training uses significant GPU memory. Shutdown kernel to release memory:
+
+```python
+import IPython
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
+```
+
+**Important**: Always run this at the end of training notebooks before switching to different models.
 
 ## When to Use This Skill
 

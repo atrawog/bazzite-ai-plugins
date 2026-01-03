@@ -21,6 +21,22 @@ This skill covers advanced QLoRA experimentation patterns for optimizing fine-tu
 | **Target Modules** | all_linear for general; mlp_only for knowledge injection |
 | **Quantization** | 4-bit NF4 matches BF16 quality with 11-15% memory savings |
 | **Continual Learning** | Sequential training adds knowledge without forgetting |
+| Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
+
+## Critical Environment Setup
+
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Force text-based progress in Jupyter
+os.environ["TQDM_NOTEBOOK"] = "false"
+
+# CRITICAL: Import unsloth FIRST
+import unsloth
+from unsloth import FastLanguageModel, is_bf16_supported
+```
 
 ## Alpha Scaling
 
@@ -575,6 +591,19 @@ What's your priority?
     ├── Sequential training
     └── Test retention after each stage
 ```
+
+## Kernel Shutdown (Jupyter)
+
+QLoRA experiments require loading/unloading multiple models. Shutdown kernel between experiments to release memory:
+
+```python
+import IPython
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
+```
+
+**Important**: Each experiment in the loop should clean up memory with `del model` and `gc.collect()`, but kernel shutdown is required between different experiment notebooks.
 
 ## When to Use This Skill
 

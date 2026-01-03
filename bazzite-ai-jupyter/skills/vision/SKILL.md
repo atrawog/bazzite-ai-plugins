@@ -20,6 +20,19 @@ Unsloth provides `FastVisionModel` for fine-tuning vision-language models (VLMs)
 | `finetune_vision_layers` | Enable training of vision encoder |
 | `finetune_language_layers` | Enable training of language model |
 | `skip_prepare_dataset=True` | Required for vision datasets |
+| `dataset_text_field=""` | Empty string for vision (not a field name) |
+| List dataset format | Use `[convert(s) for s in dataset]`, not `.map()` |
+
+## Critical Environment Setup
+
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Force text-based progress in Jupyter
+os.environ["TQDM_NOTEBOOK"] = "false"
+```
 
 ## Critical Import Order
 
@@ -30,7 +43,7 @@ from unsloth import FastVisionModel, is_bf16_supported
 from unsloth.trainer import UnslothVisionDataCollator
 
 from trl import SFTTrainer, SFTConfig
-from datasets import Dataset, load_dataset
+from datasets import load_dataset
 import torch
 ```
 
@@ -150,33 +163,35 @@ converted_dataset = dataset.map(convert_to_vision_conversation)
 
 ### Using HuggingFace Datasets
 
+**Important**: Use list comprehension, NOT `.map()` for vision datasets:
+
 ```python
 from datasets import load_dataset
 
-# Load a vision dataset from HuggingFace
-dataset = load_dataset("HuggingFaceM4/LaTeX_OCR", split="train[:100]")
+# Load LaTeX OCR dataset from HuggingFace (via Unsloth mirror)
+dataset = load_dataset("unsloth/LaTeX_OCR", split="train[:100]")
 
-def format_latex_ocr(sample):
-    """Format LaTeX OCR dataset for vision training."""
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "Convert this mathematical expression to LaTeX code."},
+instruction = "Write the LaTeX representation for this image."
+
+def convert_to_conversation(sample):
+    """Format sample for vision training."""
+    return {
+        "messages": [
+            {"role": "user", "content": [
+                {"type": "text", "text": instruction},
                 {"type": "image", "image": sample["image"]}
-            ]
-        },
-        {
-            "role": "assistant",
-            "content": [
+            ]},
+            {"role": "assistant", "content": [
                 {"type": "text", "text": sample["text"]}
-            ]
-        }
-    ]
-    return {"messages": messages}
+            ]}
+        ]
+    }
 
-converted_dataset = dataset.map(format_latex_ocr)
+# CRITICAL: Use list comprehension, NOT .map()
+converted_dataset = [convert_to_conversation(s) for s in dataset]
 ```
+
+**Why list format?** Vision datasets with PIL images work more reliably as plain Python lists than HuggingFace Dataset objects with `.map()`.
 
 ## Vision Data Collator
 
@@ -215,8 +230,9 @@ sft_config = SFTConfig(
     # Sequence length
     max_seq_length=1024,
 
-    # CRITICAL for vision
+    # CRITICAL for vision - all 3 are required
     remove_unused_columns=False,         # Keep image column
+    dataset_text_field="",               # Empty string (NOT a field name)
     dataset_kwargs={"skip_prepare_dataset": True},  # Required for vision
 
     # Other
@@ -224,6 +240,11 @@ sft_config = SFTConfig(
     report_to="none",
 )
 ```
+
+**Critical settings explained:**
+- `remove_unused_columns=False`: Preserves image column during training
+- `dataset_text_field=""`: Empty string tells TRL to use the messages format
+- `skip_prepare_dataset=True`: Prevents TRL from processing vision data incorrectly
 
 ## SFTTrainer for Vision
 
@@ -247,22 +268,31 @@ print(f"Final loss: {trainer_stats.metrics.get('train_loss', 'N/A'):.4f}")
 
 ## Complete Training Example
 
+This example matches the tested notebook pattern:
+
 ```python
-# 1. Imports
+# 1. Environment Setup
+import os
+from dotenv import load_dotenv
+load_dotenv()
+os.environ["TQDM_NOTEBOOK"] = "false"
+
+# 2. Imports (unsloth FIRST)
 import unsloth
 from unsloth import FastVisionModel, is_bf16_supported
 from unsloth.trainer import UnslothVisionDataCollator
 from trl import SFTTrainer, SFTConfig
 from datasets import load_dataset
 
-# 2. Load model
+# 3. Load model
 model, tokenizer = FastVisionModel.from_pretrained(
     "unsloth/pixtral-12b-2409-bnb-4bit",
     load_in_4bit=True,
     use_gradient_checkpointing="unsloth",
 )
+print(f"Model loaded: {type(model).__name__}")
 
-# 3. Apply LoRA
+# 4. Apply LoRA
 model = FastVisionModel.get_peft_model(
     model,
     finetune_vision_layers=True,
@@ -275,42 +305,52 @@ model = FastVisionModel.get_peft_model(
     bias="none",
     random_state=3407,
 )
+trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print(f"LoRA applied ({trainable:,} trainable params)")
 
-# 4. Prepare dataset
-dataset = load_dataset("HuggingFaceM4/LaTeX_OCR", split="train[:50]")
+# 5. Prepare dataset (use LIST, not .map())
+dataset = load_dataset("unsloth/LaTeX_OCR", split="train[:50]")
+instruction = "Write the LaTeX representation for this image."
 
-def format_sample(sample):
-    messages = [
-        {"role": "user", "content": [
-            {"type": "text", "text": "Convert to LaTeX:"},
-            {"type": "image", "image": sample["image"]}
-        ]},
-        {"role": "assistant", "content": [
-            {"type": "text", "text": sample["text"]}
-        ]}
-    ]
-    return {"messages": messages}
+def convert_to_conversation(sample):
+    return {
+        "messages": [
+            {"role": "user", "content": [
+                {"type": "text", "text": instruction},
+                {"type": "image", "image": sample["image"]}
+            ]},
+            {"role": "assistant", "content": [
+                {"type": "text", "text": sample["text"]}
+            ]}
+        ]
+    }
 
-converted_dataset = dataset.map(format_sample)
+# CRITICAL: List comprehension, not .map()
+converted_dataset = [convert_to_conversation(s) for s in dataset]
+print(f"Dataset loaded ({len(converted_dataset)} samples)")
 
-# 5. Configure training
+# 6. Configure training
 sft_config = SFTConfig(
     output_dir="./vision_lora",
     per_device_train_batch_size=1,
     gradient_accumulation_steps=4,
     max_steps=50,
+    warmup_steps=5,
     learning_rate=2e-4,
+    logging_steps=1,
     fp16=not is_bf16_supported(),
     bf16=is_bf16_supported(),
     optim="adamw_8bit",
     max_seq_length=1024,
+    # CRITICAL for vision - all 3 required
     remove_unused_columns=False,
+    dataset_text_field="",
     dataset_kwargs={"skip_prepare_dataset": True},
     seed=3407,
     report_to="none",
 )
 
-# 6. Train
+# 7. Train
 trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
@@ -319,8 +359,8 @@ trainer = SFTTrainer(
     args=sft_config,
 )
 
-trainer.train()
-print("Training complete!")
+trainer_stats = trainer.train()
+print(f"Training complete! Loss: {trainer_stats.metrics.get('train_loss', 'N/A'):.4f}")
 ```
 
 ## Inference with Vision Models
@@ -476,6 +516,19 @@ FastVisionModel.for_inference(model)
 - Use `UnslothVisionDataCollator(model, tokenizer)`
 - Ensure dataset has "messages" field with correct structure
 - Check that images are valid PIL.Image objects
+
+## Kernel Shutdown (Jupyter)
+
+Vision models use significant GPU memory. Shutdown kernel to release memory:
+
+```python
+import IPython
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
+```
+
+**Important**: Always run this at the end of training notebooks before switching to different models.
 
 ## Use Cases
 

@@ -21,6 +21,18 @@ DPO learns from preference pairs (chosen vs rejected responses) without training
 | `beta` | Temperature for implicit reward (0.1 typical) |
 | `learning_rate` | 5e-6 (most conservative of RL methods) |
 | `ref_model` | Reference model for KL constraint |
+| Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
+
+## Critical Environment Setup
+
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Force text-based progress in Jupyter
+os.environ["TQDM_NOTEBOOK"] = "false"
+```
 
 ## Critical Import Order
 
@@ -301,6 +313,19 @@ trainer = DPOTrainer(
 - Set `ref_model=None` (uses implicit reference)
 - Reduce `max_length`
 - Use gradient checkpointing
+
+## Kernel Shutdown (Jupyter)
+
+DPO training uses significant GPU memory. Shutdown kernel to release memory:
+
+```python
+import IPython
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
+```
+
+**Important**: Always run this at the end of training notebooks before switching to different models.
 
 ## When to Use This Skill
 

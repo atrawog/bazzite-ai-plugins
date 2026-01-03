@@ -21,6 +21,14 @@ Unsloth provides optimized inference through the vLLM backend, enabling 2x faste
 | `FastLanguageModel.for_inference()` | Merge LoRA adapters for inference |
 | Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
 
+## Critical Environment Setup
+
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+```
+
 ## Critical Import Order
 
 ```python
@@ -325,22 +333,20 @@ cleanup_memory()
 print(f"GPU memory after cleanup: {measure_gpu_memory()} MB")
 ```
 
-### Jupyter Kernel Restart
+### Jupyter Kernel Shutdown (Critical for vLLM)
 
-vLLM doesn't fully release GPU memory within a Jupyter session. To free memory between model tests:
+**vLLM does NOT release GPU memory within a Jupyter session.** Kernel restart is required between model tests:
 
 ```python
 import IPython
-
-def shutdown_kernel():
-    """Shutdown Jupyter kernel to release all GPU memory."""
-    print("Shutting down kernel to release GPU memory...")
-    app = IPython.Application.instance()
-    app.kernel.do_shutdown(restart=False)
-
-# Use when switching between different models
-# shutdown_kernel()
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
 ```
+
+**Important**: Always run this at the end of notebooks that use `fast_inference=True`. Without kernel shutdown, loading a different model will fail with OOM.
+
+**Notebook pattern**: All finetuning notebooks end with a shutdown cell.
 
 ## Model Loading Patterns
 

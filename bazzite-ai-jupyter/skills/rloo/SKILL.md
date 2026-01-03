@@ -19,14 +19,22 @@ RLOO is a reinforcement learning method that uses leave-one-out baseline estimat
 | `RLOOTrainer` | RL trainer with RLOO baseline |
 | `RLOOConfig` | Training hyperparameters |
 | `reward_funcs` | Reward function(s) for scoring |
+| `completion_ids` | Token IDs passed to reward functions (no re-tokenization) |
 | `num_generations` | Completions per prompt (4 typical) |
-| `beta` | KL penalty coefficient (0.05, lower than GRPO) |
+| `kl_coef` | KL penalty coefficient (0.05, lower than GRPO) |
 | `learning_rate` | 1e-5 (same as GRPO) |
+| Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
 
 ## Critical Environment Setup
 
 ```python
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Force text-based progress in Jupyter
+os.environ["TQDM_NOTEBOOK"] = "false"
+
 # CRITICAL: Set BEFORE importing unsloth/TRL
 os.environ['ACCELERATE_MIXED_PRECISION'] = 'bf16'
 ```
@@ -42,7 +50,6 @@ from unsloth import FastLanguageModel, is_bf16_supported
 from trl import RLOOConfig, RLOOTrainer
 from datasets import Dataset
 import torch
-import re
 ```
 
 ## RLOO Concepts
@@ -197,47 +204,57 @@ def trained_reward(completions, prompts):
     return reward_model.get_rewards(prompts, completions)
 ```
 
-### Thinking-Aware Reward Function
+### Thinking-Aware Reward Function (Token-Based)
 
-Same reward function used in GRPO works for RLOO:
+Use `completion_ids` parameter from TRL for efficient token-based parsing (same pattern as GRPO):
 
 ```python
-import re
+THINK_END_TOKEN_ID = 151668  # </think> token for Qwen3-Thinking models
 
-def thinking_reward_fn(completions, prompts=None, **kwargs):
+def thinking_reward_fn(completions, prompts=None, completion_ids=None, **kwargs):
     """
-    Evaluate thinking quality in completions.
+    Token-based reward function using completion_ids provided by TRL.
+
+    Benefits over string matching:
+    - No re-tokenization overhead (faster training)
+    - Exact token boundaries (no regex edge cases)
+    - Consistent with inference code pattern
 
     Scoring:
-    - No thinking tags: -1.0 (strongly penalized)
-    - Short thinking (<10 words): 0.3
-    - Medium thinking (10-30 words): 0.7
-    - Long thinking (>30 words): 1.0
+    - No </think> token: -1.0 (strongly penalized)
+    - Short thinking (<10 tokens): 0.3
+    - Medium thinking (10-30 tokens): 0.7
+    - Long thinking (>30 tokens): 1.0
     - Bonus +0.1 for self-questioning (contains '?')
     """
     rewards = []
-    for completion in completions:
-        has_thinking = "<think>" in completion or "</think>" in completion
 
-        if has_thinking:
-            think_match = re.search(r'<think>(.*?)</think>', completion, re.DOTALL)
-            thinking_content = think_match.group(1) if think_match else ""
-            thinking_words = len(thinking_content.split())
-            has_self_questions = thinking_content.count('?') >= 1
+    for completion, comp_ids in zip(completions, completion_ids):
+        # Token-based detection using </think> token ID
+        if THINK_END_TOKEN_ID in comp_ids:
+            end_idx = comp_ids.index(THINK_END_TOKEN_ID)
+            thinking_length = end_idx  # Token count before </think>
 
-            if thinking_words < 10:
-                reward = 0.3
-            elif thinking_words < 30:
+            # String-based content analysis for question detection
+            thinking_content = completion.split('</think>')[0]
+            has_self_questions = '?' in thinking_content
+
+            # Score based on thinking token count
+            if thinking_length < 10:
+                reward = 0.3  # Minimal thinking
+            elif thinking_length < 30:
                 reward = 0.7 + (0.1 if has_self_questions else 0)
             else:
                 reward = 1.0 + (0.1 if has_self_questions else 0)
         else:
-            reward = -1.0
+            reward = -1.0  # No </think> token found
 
         rewards.append(reward)
 
     return rewards
 ```
+
+**Key insight**: TRL passes `completion_ids` directly to reward functions, eliminating re-tokenization overhead.
 
 ## Training
 
@@ -317,6 +334,19 @@ trainer = RLOOTrainer(
 - Reduce `num_generations` to 2-4
 - Reduce `max_completion_length`
 - Use gradient checkpointing
+
+## Kernel Shutdown (Jupyter)
+
+RLOO training uses significant GPU memory. Shutdown kernel to release memory:
+
+```python
+import IPython
+print("Shutting down kernel to release GPU memory...")
+app = IPython.Application.instance()
+app.kernel.do_shutdown(restart=False)
+```
+
+**Important**: Always run this at the end of training notebooks before switching to different models.
 
 ## When to Use This Skill
 
