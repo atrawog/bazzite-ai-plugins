@@ -30,6 +30,11 @@ This plugin includes a Jupyter MCP server that connects to a running JupyterLab 
 | `finetuning` | Model fine-tuning with PyTorch and HuggingFace Trainer |
 | `quantization` | Model quantization for efficient inference |
 | `peft` | Parameter-efficient fine-tuning (LoRA, Unsloth) |
+| `sft` | Supervised Fine-Tuning with SFTTrainer and Unsloth |
+| `grpo` | Group Relative Policy Optimization for RLHF |
+| `dpo` | Direct Preference Optimization from preference pairs |
+| `reward` | Reward model training for RLHF pipelines |
+| `rloo` | Reinforcement Learning with Leave-One-Out baseline |
 
 ## MCP Server
 
