@@ -3,14 +3,14 @@ name: reward
 description: |
   Reward model training for RLHF pipelines. Covers RewardTrainer, preference dataset
   preparation, sequence classification heads, and reward scaling for stable
-  reinforcement learning.
+  reinforcement learning. Includes thinking quality scoring patterns.
 ---
 
 # Reward Model Training
 
 ## Overview
 
-Reward models learn to score responses based on human preferences. They're used in RLHF pipelines (PPO, GRPO, RLOO) to provide reward signals for policy optimization. The model outputs a scalar reward for each response.
+Reward models learn to score responses based on human preferences. They're used in RLHF pipelines (PPO, GRPO, RLOO) to provide reward signals for policy optimization. The model outputs a scalar reward for each response. This skill includes patterns for scoring thinking/reasoning quality.
 
 ## Quick Reference
 
@@ -18,8 +18,20 @@ Reward models learn to score responses based on human preferences. They're used 
 |-----------|---------|
 | `RewardTrainer` | Trainer for reward model |
 | `RewardConfig` | Training hyperparameters |
-| `AutoModelForSequenceClassification` | Model with classification head |
+| `AutoModelForSequenceClassification` | Model with `num_labels=1` |
+| `task_type="SEQ_CLS"` | LoRA task type for reward models |
 | Preference pairs | Training data format |
+
+## Critical Import Order
+
+```python
+# Standard transformers for reward models (not Unsloth)
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
+from peft import LoraConfig, get_peft_model
+from trl import RewardTrainer, RewardConfig
+from datasets import Dataset
+import torch
+```
 
 ## Reward Model Concepts
 
@@ -71,21 +83,68 @@ def format_for_reward(sample):
     }
 ```
 
+### Thinking Quality Preference Dataset
+
+Train reward model to score thinking quality:
+
+```python
+# Chosen = Good thinking, Rejected = Poor/no thinking
+thinking_preference_data = [
+    {
+        "prompt": "Explain recursion in programming.",
+        "chosen": """<think>
+What is recursion exactly? It's when a function calls itself.
+Why would we use this? To break down problems into smaller pieces.
+What's a good example? Factorial: 5! = 5 * 4!
+</think>
+
+Recursion is a technique where a function calls itself with a simpler version of the problem.""",
+        "rejected": "Recursion is just loops."
+    },
+    {
+        "prompt": "What is 15 + 27?",
+        "chosen": """<think>
+I need to add 15 and 27.
+Let me break it down: 15 + 27 = 15 + 20 + 7 = 35 + 7 = 42.
+</think>
+
+15 + 27 = 42""",
+        "rejected": "42"
+    },
+]
+
+dataset = Dataset.from_list(thinking_preference_data)
+```
+
 ## Setup
 
 ### Load Reward Model
 
 ```python
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
 
-model = AutoModelForSequenceClassification.from_pretrained(
-    "unsloth/Qwen3-4B-unsloth-bnb-4bit",
-    num_labels=1,  # Single scalar output
+# Quantization config
+bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
-    device_map="auto",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_quant_type="nf4",
 )
 
-tokenizer = AutoTokenizer.from_pretrained("unsloth/Qwen3-4B-unsloth-bnb-4bit")
+# Load as sequence classification model
+model = AutoModelForSequenceClassification.from_pretrained(
+    "Qwen/Qwen3-4B-Thinking-2507",  # Non-quantized base
+    num_labels=1,  # Single scalar reward output
+    quantization_config=bnb_config,
+    device_map="auto",
+    trust_remote_code=True,
+)
+
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3-4B-Thinking-2507")
+
+# Setup pad token
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
 ```
 
 ### Apply LoRA
@@ -275,3 +334,5 @@ Use when:
 - `bazzite-ai-jupyter:rloo` - Uses reward models for RL
 - `bazzite-ai-jupyter:dpo` - Alternative that doesn't need reward model
 - `bazzite-ai-jupyter:peft` - LoRA for efficient reward training
+- `bazzite-ai-jupyter:sft` - Pre-training before reward modeling
+- `bazzite-ai-jupyter:inference` - Inference for reward scoring

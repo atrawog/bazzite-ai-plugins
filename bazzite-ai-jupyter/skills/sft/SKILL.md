@@ -3,14 +3,14 @@ name: sft
 description: |
   Supervised Fine-Tuning with SFTTrainer and Unsloth. Covers dataset preparation,
   chat template formatting, training configuration, and Unsloth optimizations
-  for 2x faster instruction tuning.
+  for 2x faster instruction tuning. Includes thinking model patterns.
 ---
 
 # Supervised Fine-Tuning (SFT)
 
 ## Overview
 
-SFT adapts a pre-trained LLM to follow instructions by training on instruction-response pairs. Unsloth provides an optimized SFTTrainer for 2x faster training with reduced memory usage.
+SFT adapts a pre-trained LLM to follow instructions by training on instruction-response pairs. Unsloth provides an optimized SFTTrainer for 2x faster training with reduced memory usage. This skill includes patterns for training thinking/reasoning models.
 
 ## Quick Reference
 
@@ -20,6 +20,22 @@ SFT adapts a pre-trained LLM to follow instructions by training on instruction-r
 | `SFTTrainer` | Trainer for instruction tuning |
 | `SFTConfig` | Training hyperparameters |
 | `dataset_text_field` | Column containing formatted text |
+| Token ID 151668 | `</think>` boundary for Qwen3-Thinking models |
+
+## Critical Import Order
+
+```python
+# CRITICAL: Import unsloth FIRST for proper TRL patching
+import unsloth
+from unsloth import FastLanguageModel, is_bf16_supported
+
+# Then other imports
+from trl import SFTTrainer, SFTConfig
+from datasets import Dataset
+import torch
+```
+
+**Warning**: Importing TRL before Unsloth will disable optimizations and may cause errors.
 
 ## Dataset Formats
 
@@ -58,6 +74,42 @@ def format_conversation(sample):
 dataset = dataset.map(format_conversation)
 ```
 
+### Thinking Model Format
+
+For models like Qwen3-Thinking, include `<think>` tags in the assistant response:
+
+```python
+def format_thinking_conversation(sample):
+    """Format with thinking/reasoning tags."""
+    # Combine thinking and response with tags
+    assistant_content = f"<think>\n{sample['thinking']}\n</think>\n\n{sample['response']}"
+
+    messages = [
+        {"role": "user", "content": sample["instruction"]},
+        {"role": "assistant", "content": assistant_content}
+    ]
+    return {"text": tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=False
+    )}
+
+# Sample dataset with thinking
+thinking_data = [
+    {
+        "instruction": "What is 15 + 27?",
+        "thinking": "I need to add 15 and 27. Let me break it down: 15 + 27 = 15 + 20 + 7 = 35 + 7 = 42.",
+        "response": "15 + 27 = 42"
+    },
+    {
+        "instruction": "Explain recursion in programming.",
+        "thinking": "What is recursion? It's when a function calls itself. Why would we do this? To solve problems that can be broken into smaller, similar subproblems. What's a good example? Calculating factorial: n! = n * (n-1)!",
+        "response": "Recursion is when a function calls itself to solve a problem by breaking it into smaller, similar subproblems. For example, factorial: n! = n * (n-1)!"
+    },
+]
+
+dataset = Dataset.from_list(thinking_data)
+dataset = dataset.map(format_thinking_conversation)
+```
+
 ## Unsloth SFT Setup
 
 ### Load Model
@@ -65,9 +117,17 @@ dataset = dataset.map(format_conversation)
 ```python
 from unsloth import FastLanguageModel
 
+# Standard model
 model, tokenizer = FastLanguageModel.from_pretrained(
     "unsloth/Qwen3-4B-unsloth-bnb-4bit",
     max_seq_length=512,
+    load_in_4bit=True,
+)
+
+# Thinking model (for reasoning tasks)
+model, tokenizer = FastLanguageModel.from_pretrained(
+    "unsloth/Qwen3-4B-Thinking-2507-unsloth-bnb-4bit",
+    max_seq_length=1024,  # Increased for thinking content
     load_in_4bit=True,
 )
 ```
@@ -172,6 +232,55 @@ model, tokenizer = FastLanguageModel.from_pretrained("./sft_lora")
 FastLanguageModel.for_inference(model)
 ```
 
+### Thinking Model Inference
+
+Parse thinking content from model output using token IDs:
+
+```python
+THINK_END_TOKEN_ID = 151668  # </think> token for Qwen3-Thinking
+
+def generate_with_thinking(model, tokenizer, prompt):
+    """Generate and parse thinking model output."""
+    messages = [{"role": "user", "content": prompt}]
+    inputs = tokenizer.apply_chat_template(
+        messages, tokenize=True, add_generation_prompt=True, return_tensors="pt"
+    ).to(model.device)
+
+    # Setup pad token if needed
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token_id = tokenizer.eos_token_id
+
+    outputs = model.generate(
+        input_ids=inputs,
+        max_new_tokens=1024,
+        temperature=0.6,
+        top_p=0.95,
+        do_sample=True,
+        pad_token_id=tokenizer.pad_token_id,
+    )
+
+    # Extract only generated tokens
+    input_length = inputs.shape[1]
+    generated_ids = outputs[0][input_length:].tolist()
+
+    # Parse thinking and response
+    if THINK_END_TOKEN_ID in generated_ids:
+        end_idx = generated_ids.index(THINK_END_TOKEN_ID)
+        thinking = tokenizer.decode(generated_ids[:end_idx], skip_special_tokens=True)
+        response = tokenizer.decode(generated_ids[end_idx + 1:], skip_special_tokens=True)
+    else:
+        thinking = tokenizer.decode(generated_ids, skip_special_tokens=True)
+        response = "(incomplete - increase max_new_tokens)"
+
+    return thinking.strip(), response.strip()
+
+# Usage
+FastLanguageModel.for_inference(model)
+thinking, response = generate_with_thinking(model, tokenizer, "What is 15 + 27?")
+print(f"Thinking: {thinking}")
+print(f"Response: {response}")
+```
+
 ## Ollama Integration
 
 ### Export to GGUF
@@ -234,7 +343,10 @@ Use when:
 ## Cross-References
 
 - `bazzite-ai-jupyter:peft` - LoRA configuration details
+- `bazzite-ai-jupyter:qlora` - Advanced QLoRA experiments (alpha, rank, modules)
 - `bazzite-ai-jupyter:finetuning` - General fine-tuning concepts
 - `bazzite-ai-jupyter:dpo` - Direct Preference Optimization after SFT
 - `bazzite-ai-jupyter:grpo` - GRPO reinforcement learning after SFT
+- `bazzite-ai-jupyter:inference` - Fast inference with vLLM
+- `bazzite-ai-jupyter:vision` - Vision model fine-tuning
 - `bazzite-ai-ollama:api` - Ollama deployment

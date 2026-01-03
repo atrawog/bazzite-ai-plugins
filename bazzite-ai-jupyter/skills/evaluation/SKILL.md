@@ -330,8 +330,34 @@ Use when:
 - Building evaluation pipelines
 - Monitoring LLM performance over time
 
+## Evaluating Thinking Models
+
+For thinking models (Qwen3-Thinking), evaluate both thinking quality and response quality:
+
+```python
+thinking_quality_judge = LLMJudge(
+    provider=provider,
+    template="""Evaluate the quality of reasoning in this response.
+
+Question: {question}
+Response: {response}
+
+Score the THINKING quality (1-5):
+1 = No reasoning shown
+2 = Minimal reasoning
+3 = Some step-by-step thinking
+4 = Good reasoning with self-questioning
+5 = Excellent thorough reasoning
+
+Score:""",
+    score_range=(1, 5)
+)
+```
+
 ## Cross-References
 
 - `bazzite-ai-jupyter:langchain` - LangChain for LLM calls
 - `bazzite-ai-jupyter:rag` - RAG evaluation patterns
+- `bazzite-ai-jupyter:sft` - Training thinking models
+- `bazzite-ai-jupyter:inference` - Thinking model parsing
 - `bazzite-ai-ollama:openai` - Ollama OpenAI compatibility

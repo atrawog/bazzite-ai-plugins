@@ -3,14 +3,14 @@ name: rloo
 description: |
   Reinforcement Learning with Leave-One-Out estimation for policy optimization.
   Covers RLOOTrainer, reward function integration, baseline estimation, and
-  variance reduction techniques for stable RL training.
+  variance reduction techniques for stable RL training. Includes thinking-aware patterns.
 ---
 
 # Reinforcement Learning with Leave-One-Out (RLOO)
 
 ## Overview
 
-RLOO is a reinforcement learning method that uses leave-one-out baseline estimation for variance reduction. Like GRPO, it generates multiple completions per prompt but uses a different baseline computation that can provide more stable gradients.
+RLOO is a reinforcement learning method that uses leave-one-out baseline estimation for variance reduction. Like GRPO, it generates multiple completions per prompt but uses a different baseline computation that can provide more stable gradients. This skill includes patterns for training thinking/reasoning models.
 
 ## Quick Reference
 
@@ -18,8 +18,32 @@ RLOO is a reinforcement learning method that uses leave-one-out baseline estimat
 |-----------|---------|
 | `RLOOTrainer` | RL trainer with RLOO baseline |
 | `RLOOConfig` | Training hyperparameters |
-| `reward_model` | Reward function or model |
-| `num_generations` | Completions per prompt |
+| `reward_funcs` | Reward function(s) for scoring |
+| `num_generations` | Completions per prompt (4 typical) |
+| `beta` | KL penalty coefficient (0.05, lower than GRPO) |
+| `learning_rate` | 1e-5 (same as GRPO) |
+
+## Critical Environment Setup
+
+```python
+import os
+# CRITICAL: Set BEFORE importing unsloth/TRL
+os.environ['ACCELERATE_MIXED_PRECISION'] = 'bf16'
+```
+
+## Critical Import Order
+
+```python
+# CRITICAL: Import unsloth FIRST for proper TRL patching
+import unsloth
+from unsloth import FastLanguageModel, is_bf16_supported
+
+# Then TRL imports
+from trl import RLOOConfig, RLOOTrainer
+from datasets import Dataset
+import torch
+import re
+```
 
 ## RLOO Concepts
 
@@ -74,11 +98,24 @@ dataset = Dataset.from_dict({
 ```python
 from unsloth import FastLanguageModel
 
+# Standard model
 model, tokenizer = FastLanguageModel.from_pretrained(
     "unsloth/Qwen3-4B-unsloth-bnb-4bit",
     max_seq_length=512,
     load_in_4bit=True,
 )
+
+# Thinking model (for reasoning tasks)
+model, tokenizer = FastLanguageModel.from_pretrained(
+    "unsloth/Qwen3-4B-Thinking-2507-unsloth-bnb-4bit",
+    max_seq_length=1024,  # Increased for thinking content
+    load_in_4bit=True,
+)
+
+# Setup pad token (required for RLOO)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
 ```
 
 ### Apply LoRA
@@ -158,6 +195,48 @@ def length_reward(completions, prompts=None):
 def trained_reward(completions, prompts):
     """Use trained reward model."""
     return reward_model.get_rewards(prompts, completions)
+```
+
+### Thinking-Aware Reward Function
+
+Same reward function used in GRPO works for RLOO:
+
+```python
+import re
+
+def thinking_reward_fn(completions, prompts=None, **kwargs):
+    """
+    Evaluate thinking quality in completions.
+
+    Scoring:
+    - No thinking tags: -1.0 (strongly penalized)
+    - Short thinking (<10 words): 0.3
+    - Medium thinking (10-30 words): 0.7
+    - Long thinking (>30 words): 1.0
+    - Bonus +0.1 for self-questioning (contains '?')
+    """
+    rewards = []
+    for completion in completions:
+        has_thinking = "<think>" in completion or "</think>" in completion
+
+        if has_thinking:
+            think_match = re.search(r'<think>(.*?)</think>', completion, re.DOTALL)
+            thinking_content = think_match.group(1) if think_match else ""
+            thinking_words = len(thinking_content.split())
+            has_self_questions = thinking_content.count('?') >= 1
+
+            if thinking_words < 10:
+                reward = 0.3
+            elif thinking_words < 30:
+                reward = 0.7 + (0.1 if has_self_questions else 0)
+            else:
+                reward = 1.0 + (0.1 if has_self_questions else 0)
+        else:
+            reward = -1.0
+
+        rewards.append(reward)
+
+    return rewards
 ```
 
 ## Training
@@ -249,10 +328,23 @@ Use when:
 - Need stable RL training
 - Policy optimization from rewards
 
+## RLOO vs GRPO Comparison
+
+| Aspect | RLOO | GRPO |
+|--------|------|------|
+| Baseline | Leave-one-out mean | Group mean |
+| Variance | Lower | Higher |
+| KL penalty (beta) | 0.05 | 0.1 |
+| num_generations | 4 | 2 |
+| batch_size | 4 | 2 |
+| Stability | Often better | Good |
+| Use when | Need stable training | Faster iteration |
+
 ## Cross-References
 
 - `bazzite-ai-jupyter:sft` - Pre-training before RLOO
-- `bazzite-ai-jupyter:grpo` - Alternative RL method
+- `bazzite-ai-jupyter:grpo` - Alternative RL method (higher variance)
 - `bazzite-ai-jupyter:reward` - Training reward models for RLOO
 - `bazzite-ai-jupyter:dpo` - Simpler alternative (no RL)
 - `bazzite-ai-jupyter:peft` - LoRA for efficient training
+- `bazzite-ai-jupyter:inference` - Fast inference with vLLM

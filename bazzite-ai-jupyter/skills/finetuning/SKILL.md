@@ -3,7 +3,7 @@ name: finetuning
 description: |
   Model fine-tuning with PyTorch and HuggingFace Trainer. Covers dataset
   preparation, tokenization, training loops, TrainingArguments, SFTTrainer
-  for instruction tuning, evaluation, and checkpoint management.
+  for instruction tuning, evaluation, and checkpoint management. Includes Unsloth recommendations.
 ---
 
 # Model Fine-Tuning
@@ -12,13 +12,65 @@ description: |
 
 Fine-tuning adapts a pre-trained LLM to specific tasks by training on task-specific data. This skill covers both manual PyTorch training and HuggingFace's high-level Trainer API.
 
+**Recommended**: For 2x faster training with less memory, use **Unsloth** (see `bazzite-ai-jupyter:sft`).
+
 ## Quick Reference
 
-| Approach | Use Case |
-|----------|----------|
-| PyTorch Manual | Full control, custom training |
-| HuggingFace Trainer | Standard training, less code |
-| SFTTrainer | Instruction/chat fine-tuning |
+| Approach | Use Case | Speed |
+|----------|----------|-------|
+| **Unsloth + SFTTrainer** | **Recommended default** | **2x faster** |
+| PyTorch Manual | Full control, custom training | Baseline |
+| HuggingFace Trainer | Standard training, less code | Fast |
+| SFTTrainer | Instruction/chat fine-tuning | Fast |
+
+## Method Comparison
+
+| Method | Learning Rate | Use Case |
+|--------|---------------|----------|
+| SFT | 2e-4 | Instruction tuning (first step) |
+| GRPO | 1e-5 | RL with rewards |
+| DPO | 5e-6 | Preference learning |
+| RLOO | 1e-5 | RL with lower variance |
+| Reward | 1e-5 | Reward model training |
+
+## Unsloth Quickstart (Recommended)
+
+```python
+# CRITICAL: Import unsloth FIRST
+import unsloth
+from unsloth import FastLanguageModel, is_bf16_supported
+from trl import SFTTrainer, SFTConfig
+
+# Load model with Unsloth optimizations
+model, tokenizer = FastLanguageModel.from_pretrained(
+    "unsloth/Qwen3-4B-Thinking-2507-unsloth-bnb-4bit",
+    max_seq_length=1024,
+    load_in_4bit=True,
+)
+
+# Apply LoRA
+model = FastLanguageModel.get_peft_model(
+    model, r=16, lora_alpha=16,
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                    "gate_proj", "up_proj", "down_proj"],
+    use_gradient_checkpointing="unsloth",
+)
+
+# Train
+trainer = SFTTrainer(
+    model=model, tokenizer=tokenizer, train_dataset=dataset,
+    args=SFTConfig(
+        output_dir="./output",
+        max_steps=100,
+        learning_rate=2e-4,
+        bf16=is_bf16_supported(),
+        optim="adamw_8bit",
+    ),
+)
+trainer.train()
+```
+
+See `bazzite-ai-jupyter:sft` for complete Unsloth patterns.
 
 ## Dataset Preparation
 
@@ -410,6 +462,12 @@ Use when:
 
 ## Cross-References
 
+- `bazzite-ai-jupyter:sft` - Unsloth-optimized SFT (recommended)
+- `bazzite-ai-jupyter:grpo` - RL with reward functions
+- `bazzite-ai-jupyter:dpo` - Preference learning
+- `bazzite-ai-jupyter:rloo` - RL with lower variance
 - `bazzite-ai-jupyter:quantization` - Memory-efficient training
 - `bazzite-ai-jupyter:peft` - Parameter-efficient fine-tuning
+- `bazzite-ai-jupyter:qlora` - Advanced QLoRA experiments
+- `bazzite-ai-jupyter:inference` - Fast inference patterns
 - `bazzite-ai-jupyter:transformers` - Architecture understanding

@@ -35,6 +35,9 @@ This plugin includes a Jupyter MCP server that connects to a running JupyterLab 
 | `dpo` | Direct Preference Optimization from preference pairs |
 | `reward` | Reward model training for RLHF pipelines |
 | `rloo` | Reinforcement Learning with Leave-One-Out baseline |
+| `inference` | Fast inference with vLLM and thinking model parsing |
+| `vision` | Vision model fine-tuning with FastVisionModel |
+| `qlora` | Advanced QLoRA experiments (alpha, rank, modules) |
 
 ## MCP Server
 
@@ -77,6 +80,17 @@ requests.post(f"{OLLAMA_HOST}/api/pull", json={"name": "hf.co/NousResearch/Nous-
 **Note:** All required Python packages are pre-installed in the `bazzite-ai-pod-jupyter` container.
 
 ## Quick Start
+
+### Critical Import Order
+
+```python
+# CRITICAL: Import unsloth FIRST for proper TRL patching
+import unsloth
+from unsloth import FastLanguageModel, is_bf16_supported
+
+# Then other imports
+from trl import SFTTrainer, SFTConfig
+```
 
 ### LangChain with Ollama
 

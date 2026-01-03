@@ -308,6 +308,89 @@ with torch.no_grad():
 print(tokenizer.decode(outputs[0]))
 ```
 
+## Multi-Adapter Hot-Swapping
+
+Train task-specific adapters and swap them at inference time without reloading the base model.
+
+### Train Multiple Adapters
+
+```python
+from unsloth import FastLanguageModel
+from trl import SFTTrainer, SFTConfig
+
+TASK_DATASETS = {
+    "technical": technical_data,   # Precise, factual responses
+    "creative": creative_data,     # Imaginative, expressive responses
+    "code": code_data,             # Code-focused analysis
+}
+
+for task_name, task_data in TASK_DATASETS.items():
+    # Load fresh model
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        "unsloth/Qwen3-4B-Thinking-2507-unsloth-bnb-4bit",
+        max_seq_length=512,
+        load_in_4bit=True,
+    )
+
+    # Apply LoRA
+    model = FastLanguageModel.get_peft_model(
+        model, r=16, lora_alpha=16,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                        "gate_proj", "up_proj", "down_proj"],
+    )
+
+    # Train on task-specific data
+    trainer = SFTTrainer(model=model, train_dataset=task_data, ...)
+    trainer.train()
+
+    # Save lightweight adapter (~130MB each)
+    model.save_pretrained(f"./adapters/{task_name}")
+```
+
+### Hot-Swap at Inference
+
+```python
+from peft import PeftModel
+from unsloth import FastLanguageModel
+
+# Load base model ONCE
+base_model, tokenizer = FastLanguageModel.from_pretrained(
+    "unsloth/Qwen3-4B-Thinking-2507-unsloth-bnb-4bit",
+    max_seq_length=512,
+    load_in_4bit=True,
+)
+
+def load_and_generate(adapter_path, prompt):
+    """Load adapter and generate response."""
+    # Hot-swap adapter onto base model
+    adapted_model = PeftModel.from_pretrained(base_model, adapter_path)
+    FastLanguageModel.for_inference(adapted_model)
+
+    messages = [{"role": "user", "content": prompt}]
+    inputs = tokenizer.apply_chat_template(
+        messages, tokenize=True, add_generation_prompt=True, return_tensors="pt"
+    ).to(adapted_model.device)
+
+    outputs = adapted_model.generate(input_ids=inputs, max_new_tokens=128)
+    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+# Use different adapters for different tasks
+technical_response = load_and_generate("./adapters/technical", "Explain TCP vs UDP")
+creative_response = load_and_generate("./adapters/creative", "Write a haiku about coding")
+code_response = load_and_generate("./adapters/code", "Explain Python decorators")
+```
+
+### Adapter Storage Efficiency
+
+| Component | Size |
+|-----------|------|
+| Base model (4-bit) | ~8GB |
+| Each adapter | ~130MB |
+| 10 adapters total | ~1.3GB |
+
+**Multi-adapter approach**: 8GB + 1.3GB = 9.3GB total
+**vs 10 full models**: 80GB total
+
 ## Comparison: Full vs LoRA vs QLoRA
 
 | Aspect | Full Fine-tune | LoRA | QLoRA |
@@ -361,6 +444,9 @@ Use when:
 
 ## Cross-References
 
+- `bazzite-ai-jupyter:qlora` - Advanced QLoRA experiments (alpha, rank, modules)
 - `bazzite-ai-jupyter:finetuning` - Full fine-tuning basics
 - `bazzite-ai-jupyter:quantization` - Quantization for QLoRA
+- `bazzite-ai-jupyter:sft` - SFT training with LoRA
+- `bazzite-ai-jupyter:inference` - Fast inference with adapters
 - `bazzite-ai-jupyter:transformers` - Target module selection

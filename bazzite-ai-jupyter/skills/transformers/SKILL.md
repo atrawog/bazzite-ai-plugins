@@ -267,6 +267,52 @@ print(f"Output shape: {output.shape}")
 | `hidden_dim` | 4 * embed_dim | FFN capacity |
 | `dropout` | 0.1 | Regularization |
 
+## Thinking Model Special Tokens
+
+Qwen3-Thinking models use special tokens for chain-of-thought reasoning.
+
+### Token IDs
+
+| Token | ID | Purpose |
+|-------|----| --------|
+| `<think>` | 151667 | Start of thinking block |
+| `</think>` | 151668 | End of thinking block |
+
+### Parsing Thinking Output
+
+```python
+THINK_END_TOKEN_ID = 151668  # </think> for Qwen3-Thinking
+
+def parse_thinking_response(token_ids, tokenizer):
+    """Parse thinking model output using token ID boundary."""
+    token_list = list(token_ids)
+
+    if THINK_END_TOKEN_ID in token_list:
+        end_idx = token_list.index(THINK_END_TOKEN_ID)
+        thinking = tokenizer.decode(token_list[:end_idx], skip_special_tokens=True)
+        response = tokenizer.decode(token_list[end_idx + 1:], skip_special_tokens=True)
+    else:
+        thinking = tokenizer.decode(token_list, skip_special_tokens=True)
+        response = "(incomplete - increase max_tokens)"
+
+    return thinking.strip(), response.strip()
+```
+
+### Chat Template with Thinking
+
+```python
+# Format training data with thinking tags
+def format_thinking_sample(sample):
+    assistant_content = f"<think>\n{sample['thinking']}\n</think>\n\n{sample['response']}"
+    messages = [
+        {"role": "user", "content": sample["instruction"]},
+        {"role": "assistant", "content": assistant_content}
+    ]
+    return {"text": tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=False
+    )}
+```
+
 ## Model Size Estimation
 
 ```python
@@ -312,5 +358,7 @@ Use when:
 ## Cross-References
 
 - `bazzite-ai-jupyter:finetuning` - Fine-tuning transformers
+- `bazzite-ai-jupyter:sft` - SFT with thinking models
+- `bazzite-ai-jupyter:inference` - Fast inference patterns
 - `bazzite-ai-jupyter:peft` - Parameter-efficient tuning
 - `bazzite-ai-jupyter:quantization` - Memory optimization
