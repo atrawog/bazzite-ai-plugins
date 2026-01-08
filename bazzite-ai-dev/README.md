@@ -33,13 +33,7 @@ This plugin includes a GitHub MCP server for repository operations.
 |-------|---------|-------------|
 | build | `/bazzite-ai-dev:build` | OS image building with Podman |
 | clean | `/bazzite-ai-dev:clean` | Cleanup build artifacts and caches |
-| docs | `/bazzite-ai-dev:docs` | Documentation building and serving |
-| gh | `/bazzite-ai-dev:gh` | GitHub operations and authentication |
-| lint | `/bazzite-ai-dev:lint` | Code linting and formatting |
-| pods | `/bazzite-ai-dev:pods` | Container pod management |
 | test | `/bazzite-ai-dev:test` | Overlay testing session management |
-| validate | `/bazzite-ai-dev:validate` | Validation commands |
-| vms | `/bazzite-ai-dev:vms` | VM and ISO image creation |
 
 ## Enforcement Agents
 

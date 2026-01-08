@@ -250,7 +250,7 @@ just docs-install
 just clean podman
 
 # Then rebuild
-just build
+just build os
 ```
 
 ### Complete Fresh Start

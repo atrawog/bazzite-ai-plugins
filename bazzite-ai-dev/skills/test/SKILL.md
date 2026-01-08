@@ -15,6 +15,12 @@ The `test` command manages overlay testing sessions for bazzite-ai development. 
 
 **Key Concept:** On immutable OSTree systems (Bazzite-AI, Silverblue), `/usr` is read-only. Overlay mode temporarily unlocks it. On traditional systems (Fedora, CentOS), symlinks provide the same live-editing capability.
 
+**Command Prefix:**
+- `just test` - Development mode (from repository root, any Linux system)
+- `ujust test` - Installed mode (on bazzite-ai system with test.just installed)
+
+The Quick Reference shows `ujust` commands (installed mode). The Common Workflows section shows `just` commands (development mode from repo root).
+
 ## Quick Reference
 
 | Action | Command | Description |
