@@ -16,11 +16,11 @@ Bazzite supports NVIDIA, AMD, and Intel GPUs. This skill covers NVIDIA driver co
 
 | Command | Description |
 |---------|-------------|
-| `ujust configure-nvidia` | Configure NVIDIA drivers |
+| `ujust config-nvidia` | Configure NVIDIA drivers |
 | `ujust nvidia` | Alias for configure-nvidia |
 | `ujust toggle-nvk` | Switch between NVIDIA/NVK images |
-| `ujust configure-nvidia-optimus` | Configure Optimus power management |
-| `ujust configure-broadcom-wl` | Enable/disable Broadcom WiFi driver |
+| `ujust config-nvidia-optimus` | Configure Optimus power management |
+| `ujust config-broadcom-wl` | Enable/disable Broadcom WiFi driver |
 | `ujust enable-supergfxctl` | Enable GPU switcher for hybrid laptops |
 | `ujust _mesa-git` | Mesa testing builds |
 
@@ -30,7 +30,7 @@ Bazzite supports NVIDIA, AMD, and Intel GPUs. This skill covers NVIDIA driver co
 
 ```bash
 # Interactive NVIDIA configuration
-ujust configure-nvidia
+ujust config-nvidia
 
 # Same command
 ujust nvidia
@@ -44,7 +44,7 @@ ujust nvidia
 ### Kernel Arguments
 
 ```bash
-ujust configure-nvidia kargs
+ujust config-nvidia kargs
 ```
 
 Sets recommended kernel parameters for NVIDIA:
@@ -54,7 +54,7 @@ Sets recommended kernel parameters for NVIDIA:
 ### Test CUDA
 
 ```bash
-ujust configure-nvidia test-cuda
+ujust config-nvidia test-cuda
 ```
 
 Runs CUDA sample to verify GPU compute.
@@ -62,7 +62,7 @@ Runs CUDA sample to verify GPU compute.
 ### Firefox VA-API
 
 ```bash
-ujust configure-nvidia firefox-vaapi
+ujust config-nvidia firefox-vaapi
 ```
 
 Enables hardware video acceleration in Firefox.
@@ -94,7 +94,7 @@ ujust toggle-nvk
 
 ```bash
 # Configure NVIDIA Optimus power management
-ujust configure-nvidia-optimus
+ujust config-nvidia-optimus
 ```
 
 **Options:**
@@ -123,7 +123,7 @@ ujust enable-supergfxctl
 
 ```bash
 # Enable/disable Broadcom WL driver
-ujust configure-broadcom-wl
+ujust config-broadcom-wl
 ```
 
 Required for certain Broadcom wireless chips that don't work with open-source drivers.
@@ -154,16 +154,16 @@ ujust _mesa-git
 
 ```bash
 # Configure kernel args
-ujust configure-nvidia kargs
+ujust config-nvidia kargs
 
 # Reboot
 systemctl reboot
 
 # Test CUDA
-ujust configure-nvidia test-cuda
+ujust config-nvidia test-cuda
 
 # Enable Firefox HW accel
-ujust configure-nvidia firefox-vaapi
+ujust config-nvidia firefox-vaapi
 ```
 
 ### Laptop Power Saving
@@ -244,7 +244,7 @@ rpm-ostree kargs
 **Reinstall:**
 
 ```bash
-ujust configure-nvidia kargs
+ujust config-nvidia kargs
 systemctl reboot
 ```
 
@@ -281,7 +281,7 @@ supergfxctl -m <mode>
 
 ```bash
 nvidia-smi
-ujust configure-nvidia test-cuda
+ujust config-nvidia test-cuda
 ```
 
 **Reinstall CUDA toolkit if needed.**

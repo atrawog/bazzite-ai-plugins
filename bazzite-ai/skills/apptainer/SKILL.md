@@ -349,7 +349,7 @@ ujust apptainer cache clean
 
 - **Related Skills:** `pod` (build OCI images), `jupyter` (uses containers)
 
-- **GPU Setup:** `ujust configure gpu-containers setup`
+- **GPU Setup:** `ujust config gpu-containers setup`
 - **Apptainer Docs:** [https://apptainer.org/docs/](https://apptainer.org/docs/)
 
 ## When to Use This Skill

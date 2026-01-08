@@ -2,7 +2,7 @@
 name: network
 description: |
   Network configuration for Bazzite. iwd WiFi backend, Wake-on-LAN, and Tailscale VPN.
-  Use when users need to configure network services. For SSH, see bazzite-ai:configure.
+  Use when users need to configure network services. For SSH, see bazzite-ai:config.
 ---
 
 # Network - Bazzite Network Configuration
@@ -140,7 +140,7 @@ tailscale up
 ujust toggle-wol enable
 
 # Enable SSH (via bazzite-ai)
-ujust configure sshd enable
+ujust config sshd enable
 ```
 
 ### Better WiFi Performance

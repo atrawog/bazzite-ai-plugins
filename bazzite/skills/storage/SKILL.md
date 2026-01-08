@@ -33,7 +33,7 @@ Bazzite supports automatic mounting of drives, BTRFS features like deduplication
 |---------|-------------|
 | `ujust enable-deduplication` | Enable BTRFS dedup for /var/home |
 | `ujust enable-rmlint` | Enable/disable rmlint trim |
-| `ujust configure-snapshots` | Enable/disable snapper snapshots |
+| `ujust config-snapshots` | Enable/disable snapper snapshots |
 
 ## Automounting
 
@@ -121,7 +121,7 @@ rmlint finds and removes:
 
 ```bash
 # Enable/disable snapper snapshots for /var/home
-ujust configure-snapshots
+ujust config-snapshots
 ```
 
 **Snapper:**
@@ -157,7 +157,7 @@ ujust enable-rmlint
 
 ```bash
 # Enable snapshots
-ujust configure-snapshots
+ujust config-snapshots
 
 # View snapshots
 snapper list
@@ -285,7 +285,7 @@ snapper list
 snapper delete <number>
 
 # Or disable entirely
-ujust configure-snapshots
+ujust config-snapshots
 ```
 
 ## Cross-References

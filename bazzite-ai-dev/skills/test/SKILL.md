@@ -231,7 +231,7 @@ just test overlay refresh
 
 ```bash
 # Enable passwordless sudo first
-ujust configure passwordless-sudo enable
+ujust config passwordless-sudo enable
 
 # Then retry
 just test overlay enable
@@ -242,7 +242,7 @@ just test overlay enable
 
 - **Related Skills:** `install` (for testing install commands), `vm` (for VM testing)
 
-- **Configuration:** `ujust configure passwordless-sudo enable` for sudo access
+- **Configuration:** `ujust config passwordless-sudo enable` for sudo access
 
 - **Documentation:** [Overlay Testing Architecture](./references/overlay-architecture.md)
 

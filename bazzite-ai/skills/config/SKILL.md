@@ -1,5 +1,5 @@
 ---
-name: configure
+name: config
 description: |
   Unified system configuration dispatcher for bazzite-ai. Manages services
   (Docker, Cockpit, SSH), desktop settings (gamemode, Steam), security
@@ -7,11 +7,11 @@ description: |
   when users need to enable/disable system features or check configuration status.
 ---
 
-# Configure - System Configuration Dispatcher
+# Config - System Configuration Dispatcher
 
 ## Overview
 
-The `configure` command is a unified dispatcher for system configuration tasks. It replaces scattered `toggle-*`, `setup-*`, and `configure-*` commands with a single interface.
+The `config` command is a unified dispatcher for system configuration tasks. It replaces scattered `toggle-*`, `setup-*`, and `config-*` commands with a single interface.
 
 **Key Concept:** All configuration targets support consistent actions: `enable`, `disable`, `status`, and `help`.
 
@@ -30,7 +30,7 @@ The `configure` command is a unified dispatcher for system configuration tasks. 
 ### Command Pattern
 
 ```bash
-ujust configure TARGET="" ACTION="" ARGS...
+ujust config TARGET="" ACTION="" ARGS...
 
 ```
 
@@ -47,19 +47,19 @@ Without `TARGET`, shows interactive picker.
 ### Docker
 
 ```bash
-ujust configure docker status        # Show Docker service status
-ujust configure docker enable        # Enable Docker daemon
-ujust configure docker disable       # Disable Docker daemon
-ujust configure docker enable-socket # Enable socket activation only
+ujust config docker status        # Show Docker service status
+ujust config docker enable        # Enable Docker daemon
+ujust config docker disable       # Disable Docker daemon
+ujust config docker enable-socket # Enable socket activation only
 
 ```
 
 ### Cockpit
 
 ```bash
-ujust configure cockpit status       # Show Cockpit status
-ujust configure cockpit enable       # Enable web console
-ujust configure cockpit disable      # Disable web console
+ujust config cockpit status       # Show Cockpit status
+ujust config cockpit enable       # Enable web console
+ujust config cockpit disable      # Disable web console
 
 ```
 
@@ -68,27 +68,27 @@ Access at: `[https://localhost](https://localhost):9090`
 ### Syncthing
 
 ```bash
-ujust configure syncthing status     # Show Syncthing status
-ujust configure syncthing enable     # Enable file sync
-ujust configure syncthing disable    # Disable file sync
+ujust config syncthing status     # Show Syncthing status
+ujust config syncthing enable     # Enable file sync
+ujust config syncthing disable    # Disable file sync
 
 ```
 
 ### Libvirtd
 
 ```bash
-ujust configure libvirtd status      # Show libvirt status
-ujust configure libvirtd enable      # Enable virtualization
-ujust configure libvirtd disable     # Disable virtualization
+ujust config libvirtd status      # Show libvirt status
+ujust config libvirtd enable      # Enable virtualization
+ujust config libvirtd disable     # Disable virtualization
 
 ```
 
 ### SSH Server
 
 ```bash
-ujust configure sshd status          # Show SSH server status
-ujust configure sshd enable          # Enable SSH server
-ujust configure sshd disable         # Disable SSH server
+ujust config sshd status          # Show SSH server status
+ujust config sshd enable          # Enable SSH server
+ujust config sshd disable         # Disable SSH server
 
 ```
 
@@ -97,18 +97,18 @@ ujust configure sshd disable         # Disable SSH server
 ### Gamemode
 
 ```bash
-ujust configure gamemode status      # Show current session type
-ujust configure gamemode gamemode    # Set to Game Mode session
-ujust configure gamemode desktop     # Set to Desktop session
+ujust config gamemode status      # Show current session type
+ujust config gamemode gamemode    # Set to Game Mode session
+ujust config gamemode desktop     # Set to Desktop session
 
 ```
 
 ### Steam Autostart
 
 ```bash
-ujust configure steam-autostart status   # Show autostart status
-ujust configure steam-autostart enable   # Enable Steam autostart
-ujust configure steam-autostart disable  # Disable Steam autostart
+ujust config steam-autostart status   # Show autostart status
+ujust config steam-autostart enable   # Enable Steam autostart
+ujust config steam-autostart disable  # Disable Steam autostart
 
 ```
 
@@ -117,9 +117,9 @@ ujust configure steam-autostart disable  # Disable Steam autostart
 ### Passwordless Sudo
 
 ```bash
-ujust configure passwordless-sudo status   # Show sudo config
-ujust configure passwordless-sudo enable   # Enable passwordless sudo
-ujust configure passwordless-sudo disable  # Disable passwordless sudo
+ujust config passwordless-sudo status   # Show sudo config
+ujust config passwordless-sudo enable   # Enable passwordless sudo
+ujust config passwordless-sudo disable  # Disable passwordless sudo
 
 ```
 
@@ -130,25 +130,25 @@ ujust configure passwordless-sudo disable  # Disable passwordless sudo
 ### Podman Permissions
 
 ```bash
-ujust configure podman-permissions status   # Show Podman access
-ujust configure podman-permissions enable   # Grant Podman Desktop access
-ujust configure podman-permissions disable  # Revoke access
+ujust config podman-permissions status   # Show Podman access
+ujust config podman-permissions enable   # Grant Podman Desktop access
+ujust config podman-permissions disable  # Revoke access
 
 ```
 
 ### Podman Extensions
 
 ```bash
-ujust configure podman-extensions show      # List installed extensions
-ujust configure podman-extensions open      # Open extension manager
+ujust config podman-extensions show      # List installed extensions
+ujust config podman-extensions open      # Open extension manager
 
 ```
 
 ### WinBoat
 
 ```bash
-ujust configure winboat launch              # Launch Windows app
-ujust configure winboat info                # Show WinBoat info
+ujust config winboat launch              # Launch Windows app
+ujust config winboat info                # Show WinBoat info
 
 ```
 
@@ -157,8 +157,8 @@ ujust configure winboat info                # Show WinBoat info
 ### GPU Containers
 
 ```bash
-ujust configure gpu-containers status       # Show GPU container support
-ujust configure gpu-containers setup        # Setup GPU passthrough
+ujust config gpu-containers status       # Show GPU container support
+ujust config gpu-containers setup        # Setup GPU passthrough
 
 ```
 
@@ -173,7 +173,7 @@ Configures:
 ### Dev Environment
 
 ```bash
-ujust configure dev-environment verify      # Verify dev tools installed
+ujust config dev-environment verify      # Verify dev tools installed
 
 ```
 
@@ -185,16 +185,16 @@ Checks for required development tools and reports missing items.
 
 ```bash
 # Enable passwordless sudo for automation
-ujust configure passwordless-sudo enable
+ujust config passwordless-sudo enable
 
 # Enable Docker for container development
-ujust configure docker enable
+ujust config docker enable
 
 # Setup GPU container support
-ujust configure gpu-containers setup
+ujust config gpu-containers setup
 
 # Verify everything is ready
-ujust configure dev-environment verify
+ujust config dev-environment verify
 
 ```
 
@@ -202,14 +202,14 @@ ujust configure dev-environment verify
 
 ```bash
 # Enable SSH server
-ujust configure sshd enable
+ujust config sshd enable
 
 # Enable web console (Cockpit)
-ujust configure cockpit enable
+ujust config cockpit enable
 
 # Check both are running
-ujust configure sshd status
-ujust configure cockpit status
+ujust config sshd status
+ujust config cockpit status
 
 ```
 
@@ -217,10 +217,10 @@ ujust configure cockpit status
 
 ```bash
 # Set to Game Mode session
-ujust configure gamemode gamemode
+ujust config gamemode gamemode
 
 # Enable Steam autostart
-ujust configure steam-autostart enable
+ujust config steam-autostart enable
 
 ```
 
@@ -228,10 +228,10 @@ ujust configure steam-autostart enable
 
 ```bash
 # Set to Desktop session
-ujust configure gamemode desktop
+ujust config gamemode desktop
 
 # Disable Steam autostart
-ujust configure steam-autostart disable
+ujust config steam-autostart disable
 
 ```
 
@@ -241,8 +241,8 @@ All commands work without TTY:
 
 ```bash
 # CI/automation-friendly
-ujust configure docker enable
-ujust configure passwordless-sudo enable
+ujust config docker enable
+ujust config passwordless-sudo enable
 
 ```
 
@@ -250,7 +250,7 @@ ujust configure passwordless-sudo enable
 
 ### Service Won't Start
 
-**Symptom:** `ujust configure <service> enable` completes but service not running
+**Symptom:** `ujust config <service> enable` completes but service not running
 
 **Fix:**
 
@@ -275,7 +275,7 @@ sudo systemctl start <service>
 **Fix:**
 
 ```bash
-ujust configure podman-permissions enable
+ujust config podman-permissions enable
 # Restart Podman Desktop
 
 ```
@@ -289,7 +289,7 @@ ujust configure podman-permissions enable
 **Fix:**
 
 ```bash
-ujust configure gpu-containers setup
+ujust config gpu-containers setup
 # May require reboot
 
 ```

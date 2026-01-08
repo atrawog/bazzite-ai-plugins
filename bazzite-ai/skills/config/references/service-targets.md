@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `ujust configure` command manages various system services and settings. This reference documents all available targets.
+The `ujust config` command manages various system services and settings. This reference documents all available targets.
 
 ## Service Targets (systemd)
 
@@ -19,8 +19,8 @@ The `ujust configure` command manages various system services and settings. This
 Docker daemon for container development.
 
 ```bash
-ujust configure docker enable        # Full daemon
-ujust configure docker enable-socket # Socket activation (on-demand)
+ujust config docker enable        # Full daemon
+ujust config docker enable-socket # Socket activation (on-demand)
 
 ```
 
@@ -31,7 +31,7 @@ ujust configure docker enable-socket # Socket activation (on-demand)
 Web-based system administration console.
 
 ```bash
-ujust configure cockpit enable
+ujust config cockpit enable
 # Access at: [https://localhost](https://localhost):9090
 
 ```
@@ -51,7 +51,7 @@ Features:
 Peer-to-peer file synchronization.
 
 ```bash
-ujust configure syncthing enable
+ujust config syncthing enable
 # Web UI at: http://localhost:8384
 
 ```
@@ -61,7 +61,7 @@ ujust configure syncthing enable
 Virtualization management (QEMU/KVM).
 
 ```bash
-ujust configure libvirtd enable
+ujust config libvirtd enable
 
 ```
 
@@ -78,7 +78,7 @@ Required for:
 SSH server for remote access.
 
 ```bash
-ujust configure sshd enable
+ujust config sshd enable
 
 ```
 
@@ -98,8 +98,8 @@ Controls boot session type on Steam Deck / gaming-focused systems.
 Controls whether Steam starts on login.
 
 ```bash
-ujust configure steam-autostart enable   # Start Steam on login
-ujust configure steam-autostart disable  # Don't start Steam
+ujust config steam-autostart enable   # Start Steam on login
+ujust config steam-autostart disable  # Don't start Steam
 
 ```
 
@@ -118,7 +118,7 @@ Allows sudo without password prompt.
 - Not recommended for production/shared systems
 
 ```bash
-ujust configure passwordless-sudo enable
+ujust config passwordless-sudo enable
 # Creates: /etc/sudoers.d/50-<username>-nopasswd
 
 ```
@@ -130,7 +130,7 @@ ujust configure passwordless-sudo enable
 Configures Flatpak permissions for Podman Desktop.
 
 ```bash
-ujust configure podman-permissions enable
+ujust config podman-permissions enable
 
 ```
 
@@ -145,8 +145,8 @@ Grants access to:
 Manages Podman Desktop extensions.
 
 ```bash
-ujust configure podman-extensions show
-ujust configure podman-extensions open
+ujust config podman-extensions show
+ujust config podman-extensions open
 
 ```
 
@@ -155,8 +155,8 @@ ujust configure podman-extensions open
 Windows application integration layer.
 
 ```bash
-ujust configure winboat launch
-ujust configure winboat info
+ujust config winboat launch
+ujust config winboat info
 
 ```
 
@@ -167,7 +167,7 @@ ujust configure winboat info
 Configures GPU passthrough for containers.
 
 ```bash
-ujust configure gpu-containers setup
+ujust config gpu-containers setup
 
 ```
 
@@ -184,7 +184,7 @@ Configures:
 Verifies development tool installation.
 
 ```bash
-ujust configure dev-environment verify
+ujust config dev-environment verify
 
 ```
 

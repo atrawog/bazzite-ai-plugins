@@ -205,7 +205,7 @@ sudo visudo
 1. **Use strong passwords**
 2. **Enable automatic updates** (`ujust toggle-updates`)
 3. **Consider password feedback OFF** (hides length)
-4. **Check SSH settings** (`ujust configure sshd status`)
+4. **Check SSH settings** (`ujust config sshd status`)
 
 ## Cross-References
 

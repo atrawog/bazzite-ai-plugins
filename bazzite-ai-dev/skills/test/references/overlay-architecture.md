@@ -107,6 +107,6 @@ Run `just test overlay refresh` to regenerate 60-custom.just.
 Overlay activation requires sudo. Enable passwordless sudo for smoother workflow:
 
 ```bash
-ujust configure passwordless-sudo enable
+ujust config passwordless-sudo enable
 
 ```

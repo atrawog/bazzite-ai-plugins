@@ -61,7 +61,7 @@ ujust fix-proton-hang     # Kill hung Proton processes
 ### GPU
 
 ```bash
-ujust configure-nvidia    # NVIDIA driver config
+ujust config-nvidia    # NVIDIA driver config
 ujust toggle-nvk          # Switch NVIDIA/NVK images
 ujust enable-supergfxctl  # GPU switcher for laptops
 ```

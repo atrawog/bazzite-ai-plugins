@@ -359,7 +359,7 @@ ujust vm add myvm DISK_SIZE=200G
 
 - **Related Skills:** `bootc` (alternative: bootc-based VMs)
 
-- **Prerequisites:** `ujust configure libvirtd enable`
+- **Prerequisites:** `ujust config libvirtd enable`
 
 - **bcvk alternative:** `ujust install bcvk` + `ujust bootc`
 

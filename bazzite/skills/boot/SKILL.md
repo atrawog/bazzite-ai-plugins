@@ -19,7 +19,7 @@ The boot skill covers BIOS/UEFI access, GRUB configuration, secure boot key mana
 | `ujust bios` | Reboot to BIOS/UEFI setup |
 | `ujust bios-info` | Display BIOS information |
 | `ujust regenerate-grub` | Regenerate GRUB config |
-| `ujust configure-grub` | Configure GRUB menu visibility |
+| `ujust config-grub` | Configure GRUB menu visibility |
 | `ujust enroll-secure-boot-key` | Enroll NVIDIA/KMOD secure boot key |
 | `ujust setup-boot-windows-steam` | Add Windows to Steam boot options |
 
@@ -61,12 +61,12 @@ Useful for:
 
 ```bash
 # Interactive: choose hide/unhide/show
-ujust configure-grub
+ujust config-grub
 
 # Non-interactive options
-ujust configure-grub hide     # Hide GRUB menu (instant boot)
-ujust configure-grub unhide   # Show GRUB menu briefly
-ujust configure-grub show     # Always show GRUB menu
+ujust config-grub hide     # Hide GRUB menu (instant boot)
+ujust config-grub unhide   # Show GRUB menu briefly
+ujust config-grub show     # Always show GRUB menu
 ```
 
 ## Secure Boot
@@ -114,7 +114,7 @@ Allows booting to Windows directly from Steam's game library.
 ujust regenerate-grub
 
 # Show GRUB menu on boot
-ujust configure-grub show
+ujust config-grub show
 
 # Add Windows to Steam
 ujust setup-boot-windows-steam
@@ -134,7 +134,7 @@ ujust enroll-secure-boot-key
 
 ```bash
 # For single-boot systems
-ujust configure-grub hide
+ujust config-grub hide
 ```
 
 ## Troubleshooting
