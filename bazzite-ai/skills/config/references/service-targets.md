@@ -167,7 +167,7 @@ ujust config winboat info
 Configures GPU passthrough for containers.
 
 ```bash
-ujust config gpu-containers setup
+ujust config gpu setup
 
 ```
 

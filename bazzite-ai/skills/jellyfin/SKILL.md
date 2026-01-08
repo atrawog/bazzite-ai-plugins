@@ -299,7 +299,7 @@ Jellyfin uses host networking, but ensure:
 
 ## Cross-References
 
-- **Related Skills:** `configure gpu-containers` (GPU setup)
+- **Related Skills:** `configure gpu` (GPU setup)
 - **Jellyfin Docs:** <https://jellyfin.org/docs/>
 - **Web UI:** [http://localhost:8096](http://localhost:8096)
 

@@ -306,8 +306,8 @@ ujust jupyter config 1 8889
 
 ## Cross-References
 
-- **Related Skills:** `pod` (build images), `configure gpu-containers` (GPU setup)
-- **GPU Setup:** `ujust config gpu-containers setup`
+- **Related Skills:** `pod` (build images), `configure gpu` (GPU setup)
+- **GPU Setup:** `ujust config gpu setup`
 - **Documentation:** [Podman Quadlet Docs](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
 
 ## When to Use This Skill

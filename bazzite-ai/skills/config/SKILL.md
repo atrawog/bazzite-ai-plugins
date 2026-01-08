@@ -23,7 +23,7 @@ The `config` command is a unified dispatcher for system configuration tasks. It 
 | **Desktop** | `gamemode`, `steam-autostart` |
 | **Security** | `passwordless-sudo` |
 | **Apps** | `podman-permissions`, `podman-extensions`, `winboat` |
-| **Development** | `gpu-containers`, `dev-environment` |
+| **Development** | `gpu`, `dev-environment` |
 
 ## Parameters
 
@@ -157,8 +157,8 @@ ujust config winboat info                # Show WinBoat info
 ### GPU Containers
 
 ```bash
-ujust config gpu-containers status       # Show GPU container support
-ujust config gpu-containers setup        # Setup GPU passthrough
+ujust config gpu status       # Show GPU container support
+ujust config gpu setup        # Setup GPU passthrough
 
 ```
 
@@ -191,7 +191,7 @@ ujust config passwordless-sudo enable
 ujust config docker enable
 
 # Setup GPU container support
-ujust config gpu-containers setup
+ujust config gpu setup
 
 # Verify everything is ready
 ujust config dev-environment verify
@@ -289,7 +289,7 @@ ujust config podman-permissions enable
 **Fix:**
 
 ```bash
-ujust config gpu-containers setup
+ujust config gpu setup
 # May require reboot
 
 ```

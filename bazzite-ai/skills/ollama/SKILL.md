@@ -315,7 +315,7 @@ ujust ollama restart
 
 ## Cross-References
 
-- **Related Skills:** `configure gpu-containers` (GPU setup), `jupyter` (ML development)
+- **Related Skills:** `configure gpu` (GPU setup), `jupyter` (ML development)
 - **API Docs:** [https://ollama.ai/docs](https://ollama.ai/docs)
 - **Model Library:** [https://ollama.ai/library](https://ollama.ai/library)
 
