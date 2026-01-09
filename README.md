@@ -67,7 +67,6 @@ Skills for using Bazzite AI OS features via `ujust` commands:
 - **install** - System package and tool installation
 - **jellyfin** - Jellyfin media server management
 - **jupyter** - JupyterLab server management
-- **mirror** - Repository mirroring
 - **ollama** - Ollama LLM inference server
 - **runners** - GitHub Actions self-hosted runners
 - **shell** - Shell configuration and customization

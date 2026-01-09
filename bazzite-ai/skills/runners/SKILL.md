@@ -177,14 +177,6 @@ Runners access host container cache (read-only):
 - Shared cache across runners
 - No duplicate downloads
 
-### Podman Mirror Integration
-
-If configured, runners use local registry mirror:
-
-- Transparent caching
-- Faster pulls
-- Reduced bandwidth
-
 ## Configuration Files
 
 | File | Purpose | Location |
@@ -321,20 +313,9 @@ ujust runners logs 1 100
 - Image issues
 - Resource exhaustion
 
-### Slow Builds
-
-**Optimize:**
-
-```bash
-# Setup local registry mirror
-ujust mirror config
-
-# Runners auto-use mirror if configured
-```
-
 ## Cross-References
 
-- **Related Skills:** `mirror` (registry caching), `pod` (build images)
+- **Related Skills:** `pod` (build images)
 - **GitHub Docs:** Actions → Self-hosted runners
 - **Authentication:** `gh auth login`
 

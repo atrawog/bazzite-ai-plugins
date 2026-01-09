@@ -17,7 +17,6 @@ This plugin provides skills for **OS users** who want to manage and configure Ba
 | install | `/bazzite-ai:install` | System package and tool installation |
 | jellyfin | `/bazzite-ai:jellyfin` | Jellyfin media server management |
 | jupyter | `/bazzite-ai:jupyter` | JupyterLab server management |
-| mirror | `/bazzite-ai:mirror` | Repository mirroring |
 | ollama | `/bazzite-ai:ollama` | Ollama LLM inference server |
 | runners | `/bazzite-ai:runners` | GitHub Actions self-hosted runners |
 | shell | `/bazzite-ai:shell` | Shell configuration and customization |
