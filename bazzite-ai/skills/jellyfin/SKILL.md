@@ -18,49 +18,49 @@ The `jellyfin` command manages Jellyfin media server instances using Podman Quad
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust jellyfin config <CONFIG> <CACHE> <MEDIA> [N] [GPU] [IMAGE] [WORKSPACE]` | Configure instance |
-| Start | `ujust jellyfin start [N\|all]` | Start instance(s) |
-| Stop | `ujust jellyfin stop [N\|all]` | Stop instance(s) |
-| Restart | `ujust jellyfin restart [N\|all]` | Restart instance(s) |
-| Logs | `ujust jellyfin logs [N] [LINES]` | View logs |
+| Config | `ujust jellyfin config --config-dir=<CONFIG> --cache-dir=<CACHE> --media-dir=<MEDIA>` | Configure instance |
+| Start | `ujust jellyfin start [--instance=N\|all]` | Start instance(s) |
+| Stop | `ujust jellyfin stop [--instance=N\|all]` | Stop instance(s) |
+| Restart | `ujust jellyfin restart [--instance=N\|all]` | Restart instance(s) |
+| Logs | `ujust jellyfin logs [--instance=N] [--lines=...]` | View logs |
 | List | `ujust jellyfin list` | List all instances |
-| Status | `ujust jellyfin status [N]` | Show instance status |
-| URL | `ujust jellyfin url [N]` | Show access URL |
-| Shell | `ujust jellyfin shell [CMD] [N]` | Open shell in container |
-| Delete | `ujust jellyfin delete [N\|all]` | Remove instance(s) and images |
+| Status | `ujust jellyfin status [--instance=N]` | Show instance status |
+| URL | `ujust jellyfin url [--instance=N]` | Show access URL |
+| Shell | `ujust jellyfin shell [--instance=N] [-- CMD...]` | Open shell in container |
+| Delete | `ujust jellyfin delete [--instance=N\|all]` | Remove instance(s) and images |
 
 ## Configuration
 
-### Config Parameters
+### Parameters
 
-```bash
-ujust jellyfin config <CONFIG> <CACHE> <MEDIA> [INSTANCE] [GPU] [IMAGE] [WORKSPACE]
-```
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `CONFIG` | Yes | Configuration directory |
-| `CACHE` | Yes | Cache directory (transcoding) |
-| `MEDIA` | Yes | Media library path |
-| `INSTANCE` | No | Instance number (default: 1) |
-| `GPU` | No | GPU type: nvidia, amd, intel, auto |
-| `IMAGE` | No | Container image or tag (default: stable) |
-| `WORKSPACE` | No | Optional additional mount to /workspace |
+| Parameter | Long Flag | Short | Required | Description |
+|-----------|-----------|-------|----------|-------------|
+| Config Dir | `--config-dir` | `-c` | Yes | Configuration directory |
+| Cache Dir | `--cache-dir` | - | Yes | Cache directory (transcoding) |
+| Media Dir | `--media-dir` | - | Yes | Media library path |
+| Instance | `--instance` | `-n` | No | Instance number (default: 1) |
+| GPU Type | `--gpu-type` | `-g` | No | GPU: nvidia, amd, intel, auto |
+| Image | `--image` | `-i` | No | Container image |
+| Tag | `--tag` | `-t` | No | Image tag (default: stable) |
+| Workspace | `--workspace-dir` | `-w` | No | Optional mount to /workspace |
+| Bind | `--bind` | `-b` | No | Bind address |
+| Port | `--port` | `-p` | No | Service port |
+| Lines | `--lines` | `-l` | No | Log lines to show |
 
 ### Configuration Examples
 
 ```bash
-# Basic installation
-ujust jellyfin config ~/jellyfin/config ~/jellyfin/cache ~/media 1
+# Basic installation (long form)
+ujust jellyfin config --config-dir=~/jellyfin/config --cache-dir=~/jellyfin/cache --media-dir=~/media
 
 # With NVIDIA GPU for transcoding
-ujust jellyfin config ~/jellyfin/config ~/jellyfin/cache ~/media 1 nvidia
+ujust jellyfin config -c ~/jellyfin/config --cache-dir=~/jellyfin/cache --media-dir=~/media --gpu-type=nvidia
 
 # Second instance for different library
-ujust jellyfin config ~/jellyfin2/config ~/jellyfin2/cache ~/videos 2
+ujust jellyfin config -c ~/jellyfin2/config --cache-dir=~/jellyfin2/cache --media-dir=~/videos --instance=2
 
-# With custom image and workspace
-ujust jellyfin config ~/config ~/cache ~/media 1 auto "docker.io/jellyfin/jellyfin:10.8.13" /projects
+# With short forms
+ujust jellyfin config -c ~/config --cache-dir=~/cache --media-dir=~/media -n 1 -g nvidia
 ```
 
 ### Update Existing Configuration
@@ -73,11 +73,11 @@ Running `config` when already configured will update the existing configuration,
 # Interactive bash shell
 ujust jellyfin shell
 
-# Run specific command
-ujust jellyfin shell "df -h"
+# Run specific command (use -- separator)
+ujust jellyfin shell -- df -h
 
 # Shell in specific instance
-ujust jellyfin shell "ls /media" 2
+ujust jellyfin shell --instance=2 -- ls /media
 ```
 
 ## Lifecycle Commands
@@ -86,29 +86,39 @@ ujust jellyfin shell "ls /media" 2
 
 ```bash
 # Single instance
-ujust jellyfin start 1
-ujust jellyfin stop 1
+ujust jellyfin start --instance=1
+ujust jellyfin stop --instance=1
+
+# Short form
+ujust jellyfin start -n 1
+ujust jellyfin stop -n 1
 
 # All instances
-ujust jellyfin start all
-ujust jellyfin stop all
+ujust jellyfin start --instance=all
+ujust jellyfin stop --instance=all
 ```
 
 ### View Logs
 
 ```bash
 # Follow logs
-ujust jellyfin logs 1
+ujust jellyfin logs
 
-# Last N lines
-ujust jellyfin logs 1 100
+# Specific instance with line count
+ujust jellyfin logs --instance=1 --lines=100
+
+# Short form
+ujust jellyfin logs -n 1 -l 100
 ```
 
 ### Get URL
 
 ```bash
-ujust jellyfin url 1
+ujust jellyfin url
 # Output: http://localhost:8096
+
+# Specific instance
+ujust jellyfin url --instance=2
 ```
 
 ## Port Allocation
@@ -124,24 +134,23 @@ ujust jellyfin url 1
 
 ### GPU Types
 
-| GPU | Flag | Transcoding |
-|-----|------|-------------|
-| NVIDIA | `nvidia` | NVENC/NVDEC |
-| AMD | `amd` | VAAPI |
-| Intel | `intel` | QuickSync |
+| GPU | Flag Value | Transcoding |
+|-----|------------|-------------|
+| NVIDIA | `--gpu-type=nvidia` or `-g nvidia` | NVENC/NVDEC |
+| AMD | `--gpu-type=amd` or `-g amd` | VAAPI |
+| Intel | `--gpu-type=intel` or `-g intel` | QuickSync |
 
 ### Enable GPU
 
 ```bash
-ujust jellyfin config ~/config ~/cache ~/media 1 nvidia
+ujust jellyfin config -c ~/config --cache-dir=~/cache --media-dir=~/media --gpu-type=nvidia
 ```
 
 ### Verify GPU
 
 ```bash
 # Check inside container
-ujust jellyfin shell
-nvidia-smi  # or vainfo for AMD/Intel
+ujust jellyfin shell -- nvidia-smi  # or vainfo for AMD/Intel
 ```
 
 ## FUSE Filesystem Support
@@ -184,13 +193,13 @@ Jellyfin uses host networking for:
 mkdir -p ~/jellyfin/{config,cache}
 
 # 2. Configure Jellyfin
-ujust jellyfin config ~/jellyfin/config ~/jellyfin/cache ~/media 1 nvidia
+ujust jellyfin config -c ~/jellyfin/config --cache-dir=~/jellyfin/cache --media-dir=~/media --gpu-type=nvidia
 
 # 3. Start it
-ujust jellyfin start 1
+ujust jellyfin start
 
 # 4. Access web UI
-ujust jellyfin url 1
+ujust jellyfin url
 # Open http://localhost:8096
 ```
 
@@ -198,13 +207,13 @@ ujust jellyfin url 1
 
 ```bash
 # Movies library
-ujust jellyfin config ~/jellyfin-movies/config ~/jellyfin-movies/cache ~/movies 1
+ujust jellyfin config -c ~/jellyfin-movies/config --cache-dir=~/jellyfin-movies/cache --media-dir=~/movies -n 1
 
 # TV library
-ujust jellyfin config ~/jellyfin-tv/config ~/jellyfin-tv/cache ~/tv 2
+ujust jellyfin config -c ~/jellyfin-tv/config --cache-dir=~/jellyfin-tv/cache --media-dir=~/tv -n 2
 
 # Start both
-ujust jellyfin start all
+ujust jellyfin start --instance=all
 ```
 
 ### Cloud Storage
@@ -214,10 +223,10 @@ ujust jellyfin start all
 rclone mount gdrive:media ~/cloud-media --daemon --vfs-cache-mode writes
 
 # 2. Configure Jellyfin pointing to mount
-ujust jellyfin config ~/jellyfin/config ~/jellyfin/cache ~/cloud-media 1
+ujust jellyfin config -c ~/jellyfin/config --cache-dir=~/jellyfin/cache --media-dir=~/cloud-media
 
 # 3. Start
-ujust jellyfin start 1
+ujust jellyfin start
 ```
 
 ## Initial Configuration
@@ -237,8 +246,8 @@ First-time setup via web UI:
 **Check:**
 
 ```bash
-ujust jellyfin status 1
-ujust jellyfin logs 1 50
+ujust jellyfin status
+ujust jellyfin logs --lines=50
 ```
 
 **Common causes:**
@@ -253,7 +262,7 @@ ujust jellyfin logs 1 50
 
 ```bash
 # View logs for transcoding errors
-ujust jellyfin logs 1 | grep -i transcode
+ujust jellyfin logs | grep -i transcode
 ```
 
 **Common causes:**
@@ -265,8 +274,8 @@ ujust jellyfin logs 1 | grep -i transcode
 
 ```bash
 # Reconfigure with GPU
-ujust jellyfin delete 1
-ujust jellyfin config ~/config ~/cache ~/media 1 nvidia
+ujust jellyfin delete
+ujust jellyfin config -c ~/config --cache-dir=~/cache --media-dir=~/media --gpu-type=nvidia
 ```
 
 ### Media Not Found
@@ -284,8 +293,8 @@ ujust jellyfin config ~/config ~/cache ~/media 1 nvidia
 ls ~/media
 
 # Reconfigure with correct path
-ujust jellyfin delete 1
-ujust jellyfin config ~/config ~/cache /correct/path 1
+ujust jellyfin delete
+ujust jellyfin config -c ~/config --cache-dir=~/cache --media-dir=/correct/path
 ```
 
 ### DLNA Not Working

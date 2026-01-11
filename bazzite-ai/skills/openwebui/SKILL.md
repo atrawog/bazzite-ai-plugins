@@ -18,30 +18,30 @@ The `openwebui` command manages the Open WebUI service using Podman Quadlet cont
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust openwebui config` | Configure instance |
-| Start | `ujust openwebui start` | Start service |
-| Stop | `ujust openwebui stop` | Stop service |
-| Restart | `ujust openwebui restart` | Restart service |
-| Logs | `ujust openwebui logs` | View logs |
-| Status | `ujust openwebui status` | Show status |
-| URL | `ujust openwebui url` | Show access URL |
+| Config | `ujust openwebui config [--port=...] [--bind=...]` | Configure instance |
+| Start | `ujust openwebui start [--instance=...]` | Start service |
+| Stop | `ujust openwebui stop [--instance=...]` | Stop service |
+| Restart | `ujust openwebui restart [--instance=...]` | Restart service |
+| Logs | `ujust openwebui logs [--lines=...]` | View logs |
+| Status | `ujust openwebui status [--instance=...]` | Show status |
+| URL | `ujust openwebui url [--instance=...]` | Show access URL |
 | List | `ujust openwebui list` | List instances |
-| Shell | `ujust openwebui shell` | Container shell |
-| Delete | `ujust openwebui delete` | Remove service |
+| Shell | `ujust openwebui shell [-- CMD...]` | Container shell |
+| Delete | `ujust openwebui delete [--instance=...]` | Remove service |
 
-## Named Parameters
+## Parameters
 
-All parameters use named syntax (e.g., `PORT=3001`):
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `ACTION` | (menu) | Action to perform |
-| `PORT` | 3000 | Host port for web UI |
-| `IMAGE` | `ghcr.io/open-webui/open-webui:main` | Container image |
-| `BIND` | 127.0.0.1 | Bind address (127.0.0.1 or 0.0.0.0) |
-| `INSTANCE` | 1 | Instance number or `all` |
-| `LINES` | 50 | Log lines to show |
-| `CMD` | (empty) | Shell command |
+| Parameter | Long Flag | Short | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| Port | `--port` | `-p` | `3000` | Host port for web UI |
+| Image | `--image` | `-i` | `ghcr.io/open-webui/open-webui:main` | Container image |
+| Tag | `--tag` | `-t` | `main` | Image tag |
+| Bind | `--bind` | `-b` | `127.0.0.1` | Bind address |
+| Config Dir | `--config-dir` | `-c` | `~/.config/openwebui/1` | Config/data directory |
+| Workspace | `--workspace-dir` | `-w` | (empty) | Workspace mount |
+| GPU Type | `--gpu-type` | `-g` | `auto` | GPU type |
+| Instance | `--instance` | `-n` | `1` | Instance number or `all` |
+| Lines | `--lines` | `-l` | `50` | Log lines to show |
 
 ## Configuration
 
@@ -49,17 +49,23 @@ All parameters use named syntax (e.g., `PORT=3001`):
 # Default configuration (port 3000, localhost only)
 ujust openwebui config
 
-# Custom port
-ujust openwebui config PORT=3001
+# Custom port (long form)
+ujust openwebui config --port=3001
 
-# Network-wide access (0.0.0.0)
-ujust openwebui config BIND=0.0.0.0
+# Custom port (short form)
+ujust openwebui config -p 3001
 
-# Combine parameters
-ujust openwebui config PORT=3001 BIND=0.0.0.0
+# Network-wide access
+ujust openwebui config --bind=0.0.0.0
+
+# Combine parameters (long form)
+ujust openwebui config --port=3001 --bind=0.0.0.0
+
+# Combine parameters (short form)
+ujust openwebui config -p 3001 -b 0.0.0.0
 
 # GPU-optimized image
-ujust openwebui config IMAGE=ghcr.io/open-webui/open-webui:cuda
+ujust openwebui config --image=ghcr.io/open-webui/open-webui:cuda
 ```
 
 ### Update Existing Configuration
@@ -68,10 +74,10 @@ Running `config` when already configured updates the existing settings:
 
 ```bash
 # Change only the bind address
-ujust openwebui config BIND=0.0.0.0
+ujust openwebui config --bind=0.0.0.0
 
 # Update port without affecting other settings
-ujust openwebui config PORT=3002
+ujust openwebui config --port=3002
 ```
 
 ## Container Images
@@ -99,8 +105,11 @@ ujust openwebui restart
 # View logs (default 50 lines)
 ujust openwebui logs
 
-# View more logs
-ujust openwebui logs LINES=200
+# View more logs (long form)
+ujust openwebui logs --lines=200
+
+# View more logs (short form)
+ujust openwebui logs -l 200
 
 # Check status
 ujust openwebui status
@@ -112,14 +121,17 @@ ujust openwebui url
 ## Multi-Instance Support
 
 ```bash
-# Start all instances
-ujust openwebui start INSTANCE=all
+# Start all instances (long form)
+ujust openwebui start --instance=all
+
+# Start all instances (short form)
+ujust openwebui start -n all
 
 # Stop specific instance
-ujust openwebui stop INSTANCE=2
+ujust openwebui stop --instance=2
 
 # Delete all instances
-ujust openwebui delete INSTANCE=all
+ujust openwebui delete --instance=all
 ```
 
 ## Shell Access
@@ -128,9 +140,9 @@ ujust openwebui delete INSTANCE=all
 # Interactive shell
 ujust openwebui shell
 
-# Run specific command
-ujust openwebui shell CMD="ls -la /app/backend/data"
-ujust openwebui shell CMD="cat /app/backend/data/config.json"
+# Run specific command (use -- separator)
+ujust openwebui shell -- ls -la /app/backend/data
+ujust openwebui shell -- cat /app/backend/data/config.json
 ```
 
 ## Network Architecture
@@ -163,11 +175,11 @@ COMFYUI_HOST=http://comfyui:8188
 | `127.0.0.1` | Localhost only | Default, secure |
 | `0.0.0.0` | All interfaces | Network access, Tailscale |
 
-**Security Note:** Using `BIND=0.0.0.0` exposes the service to your network. Consider using Tailscale for secure remote access:
+**Security Note:** Using `--bind=0.0.0.0` exposes the service to your network. Consider using Tailscale for secure remote access:
 
 ```bash
 # Expose via Tailscale (secure)
-ujust tailscale serve openwebui
+ujust tailscale serve --service=openwebui
 ```
 
 ## Data Persistence
@@ -201,13 +213,13 @@ ujust openwebui url
 
 ```bash
 # Configure for network access
-ujust openwebui config BIND=0.0.0.0
+ujust openwebui config --bind=0.0.0.0
 
 # Start the service
 ujust openwebui start
 
 # Or use Tailscale for secure access
-ujust tailscale serve openwebui
+ujust tailscale serve --service=openwebui
 ```
 
 ### Upgrade Container Image
@@ -217,7 +229,7 @@ ujust tailscale serve openwebui
 ujust openwebui stop
 
 # Update to new image
-ujust openwebui config IMAGE=ghcr.io/open-webui/open-webui:main
+ujust openwebui config --image=ghcr.io/open-webui/open-webui:main
 
 # Restart
 ujust openwebui start
@@ -236,7 +248,7 @@ GPU is automatically detected and attached:
 Check GPU status:
 
 ```bash
-ujust openwebui shell CMD="nvidia-smi"
+ujust openwebui shell -- nvidia-smi
 ```
 
 ## Troubleshooting
@@ -248,7 +260,7 @@ ujust openwebui shell CMD="nvidia-smi"
 ujust openwebui status
 
 # View logs
-ujust openwebui logs LINES=100
+ujust openwebui logs --lines=100
 
 # Check if Ollama is running
 ujust ollama status
@@ -271,7 +283,7 @@ ujust ollama status
 ujust ollama status
 
 # Test Ollama connection from Open WebUI container
-ujust openwebui shell CMD="curl http://ollama:11434/api/tags"
+ujust openwebui shell -- curl http://ollama:11434/api/tags
 ```
 
 **Fix:**
@@ -299,7 +311,7 @@ ujust openwebui url
 
 ```bash
 # If using wrong bind address
-ujust openwebui config BIND=127.0.0.1
+ujust openwebui config --bind=127.0.0.1
 ujust openwebui restart
 ```
 
@@ -307,7 +319,7 @@ ujust openwebui restart
 
 ```bash
 # Delete everything
-ujust openwebui delete INSTANCE=all
+ujust openwebui delete --instance=all
 
 # Reconfigure
 ujust openwebui config

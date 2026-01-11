@@ -23,30 +23,30 @@ The `localai` command manages the LocalAI service using Podman Quadlet container
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust localai config` | Configure instance |
-| Start | `ujust localai start` | Start service |
-| Stop | `ujust localai stop` | Stop service |
-| Restart | `ujust localai restart` | Restart service |
-| Logs | `ujust localai logs` | View logs |
-| Status | `ujust localai status` | Show status |
-| URL | `ujust localai url` | Show API URL |
+| Config | `ujust localai config [--port=...] [--bind=...]` | Configure instance |
+| Start | `ujust localai start [--instance=...]` | Start service |
+| Stop | `ujust localai stop [--instance=...]` | Stop service |
+| Restart | `ujust localai restart [--instance=...]` | Restart service |
+| Logs | `ujust localai logs [--lines=...]` | View logs |
+| Status | `ujust localai status [--instance=...]` | Show status |
+| URL | `ujust localai url [--instance=...]` | Show API URL |
 | List | `ujust localai list` | List instances |
-| Shell | `ujust localai shell` | Container shell |
-| Delete | `ujust localai delete` | Remove service |
+| Shell | `ujust localai shell [-- CMD...]` | Container shell |
+| Delete | `ujust localai delete [--instance=...]` | Remove service |
 
-## Named Parameters
+## Parameters
 
-All parameters use named syntax (e.g., `PORT=8081`):
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `ACTION` | (menu) | Action to perform |
-| `PORT` | 8080 | Host port for API |
-| `IMAGE` | (auto by GPU) | Container image |
-| `BIND` | 127.0.0.1 | Bind address (127.0.0.1 or 0.0.0.0) |
-| `INSTANCE` | 1 | Instance number or `all` |
-| `LINES` | 50 | Log lines to show |
-| `CMD` | (empty) | Shell command |
+| Parameter | Long Flag | Short | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| Port | `--port` | `-p` | `8080` | Host port for API |
+| Image | `--image` | `-i` | (auto by GPU) | Container image |
+| Tag | `--tag` | `-t` | `latest` | Image tag |
+| Bind | `--bind` | `-b` | `127.0.0.1` | Bind address |
+| Config Dir | `--config-dir` | `-c` | `~/.config/localai/1` | Config/models directory |
+| Workspace | `--workspace-dir` | `-w` | (empty) | Workspace mount |
+| GPU Type | `--gpu-type` | `-g` | `auto` | GPU type |
+| Instance | `--instance` | `-n` | `1` | Instance number or `all` |
+| Lines | `--lines` | `-l` | `50` | Log lines to show |
 
 ## GPU-Specific Images
 
@@ -67,17 +67,23 @@ The appropriate image is automatically selected based on detected GPU hardware.
 # Default configuration (auto-detects GPU, port 8080)
 ujust localai config
 
-# Custom port
-ujust localai config PORT=8081
+# Custom port (long form)
+ujust localai config --port=8081
 
-# Network-wide access (0.0.0.0)
-ujust localai config BIND=0.0.0.0
+# Custom port (short form)
+ujust localai config -p 8081
+
+# Network-wide access
+ujust localai config --bind=0.0.0.0
 
 # Force CPU image (ignore GPU)
-ujust localai config IMAGE=localai/localai:latest
+ujust localai config --image=localai/localai:latest
 
-# Combine parameters
-ujust localai config PORT=8081 BIND=0.0.0.0
+# Combine parameters (long form)
+ujust localai config --port=8081 --bind=0.0.0.0
+
+# Combine parameters (short form)
+ujust localai config -p 8081 -b 0.0.0.0
 ```
 
 ### Update Existing Configuration
@@ -86,10 +92,10 @@ Running `config` when already configured updates the existing settings:
 
 ```bash
 # Change only the bind address
-ujust localai config BIND=0.0.0.0
+ujust localai config --bind=0.0.0.0
 
 # Update port without affecting other settings
-ujust localai config PORT=8082
+ujust localai config --port=8082
 ```
 
 ## Lifecycle Management
@@ -107,8 +113,11 @@ ujust localai restart
 # View logs (default 50 lines)
 ujust localai logs
 
-# View more logs
-ujust localai logs LINES=200
+# View more logs (long form)
+ujust localai logs --lines=200
+
+# View more logs (short form)
+ujust localai logs -l 200
 
 # Check status
 ujust localai status
@@ -120,14 +129,17 @@ ujust localai url
 ## Multi-Instance Support
 
 ```bash
-# Start all instances
-ujust localai start INSTANCE=all
+# Start all instances (long form)
+ujust localai start --instance=all
+
+# Start all instances (short form)
+ujust localai start -n all
 
 # Stop specific instance
-ujust localai stop INSTANCE=2
+ujust localai stop --instance=2
 
 # Delete all instances
-ujust localai delete INSTANCE=all
+ujust localai delete --instance=all
 ```
 
 ## Shell Access
@@ -136,9 +148,9 @@ ujust localai delete INSTANCE=all
 # Interactive shell
 ujust localai shell
 
-# Run specific command
-ujust localai shell CMD="ls -la /models"
-ujust localai shell CMD="nvidia-smi"
+# Run specific command (use -- separator)
+ujust localai shell -- ls -la /models
+ujust localai shell -- nvidia-smi
 ```
 
 ## Network Architecture
@@ -249,13 +261,13 @@ ujust localai start
 
 ```bash
 # Configure for network access
-ujust localai config BIND=0.0.0.0
+ujust localai config --bind=0.0.0.0
 
 # Start the service
 ujust localai start
 
 # Or use Tailscale for secure access
-ujust tailscale serve localai
+ujust tailscale serve --service=localai
 ```
 
 ## GPU Support
@@ -272,10 +284,10 @@ GPU is automatically detected and the appropriate image is selected:
 
 ```bash
 # NVIDIA
-ujust localai shell CMD="nvidia-smi"
+ujust localai shell -- nvidia-smi
 
 # Check GPU environment
-ujust localai shell CMD="env | grep -i gpu"
+ujust localai shell -- env | grep -i gpu
 ```
 
 ## Troubleshooting
@@ -287,7 +299,7 @@ ujust localai shell CMD="env | grep -i gpu"
 ujust localai status
 
 # View logs
-ujust localai logs LINES=100
+ujust localai logs --lines=100
 
 # Check image was pulled
 podman images | grep localai
@@ -328,14 +340,14 @@ rocminfo
 curl http://localhost:8080/v1/models
 
 # Check logs for errors
-ujust localai logs LINES=100
+ujust localai logs --lines=100
 ```
 
 ### Clear Data and Start Fresh
 
 ```bash
 # Delete everything
-ujust localai delete INSTANCE=all
+ujust localai delete --instance=all
 
 # Reconfigure
 ujust localai config

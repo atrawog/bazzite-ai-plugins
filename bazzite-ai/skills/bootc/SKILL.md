@@ -19,15 +19,15 @@ The `bootc` command manages bootable container VMs using bcvk (bootc virtualizat
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Test | `ujust bootc test [IMAGE]` | Ephemeral VM (deleted on exit) |
-| Add | `ujust bootc add [NAME] [IMAGE]` | Create persistent VM |
+| Test | `ujust bootc test [--image=...] [--cpus=...]` | Ephemeral VM (deleted on exit) |
+| Add | `ujust bootc add [NAME] [--image=...] [--cpus=...]` | Create persistent VM |
 | List | `ujust bootc list` | List all VMs |
 | Status | `ujust bootc status [NAME]` | Show VM status |
-| SSH | `ujust bootc ssh [NAME]` | Connect to VM |
+| SSH | `ujust bootc ssh [NAME] [--ssh-user=...]` | Connect to VM |
 | Start | `ujust bootc start [NAME]` | Start VM |
 | Stop | `ujust bootc stop [NAME]` | Stop VM |
 | Delete | `ujust bootc delete [NAME]` | Remove VM |
-| Export | `ujust bootc export [IMAGE] [FORMAT]` | Export to disk image |
+| Export | `ujust bootc export [--image=...] [--format=...]` | Export to disk image |
 | Images | `ujust bootc images` | List available images |
 | Help | `ujust bootc help` | Show help |
 
@@ -39,23 +39,21 @@ ujust install bcvk
 
 # Verify installation
 bcvk --version
-
 ```
 
 ## Parameters
 
-### Common Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `IMAGE` | (varies) | Container image to boot |
-| `VM_NAME` | `bazzite-bootc` | VM name |
-| `CPUS` | `2` | Number of CPUs |
-| `RAM` | `4096` | Memory in MB |
-| `DISK_SIZE` | `20G` | Disk size |
-| `SSH_PORT` | `2222` | SSH port |
-| `SSH_USER` | `root` | SSH user |
-| `FORMAT` | `qcow2` | Export format |
+| Parameter | Long Flag | Short | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| action | (positional) | - | required | Action: test, add, list, status, ssh, etc. |
+| vm_name | (positional) | - | `bazzite-bootc` | VM name |
+| image | `--image` | `-i` | (varies) | Container image to boot |
+| cpus | `--cpus` | - | `2` | Number of CPUs |
+| ram | `--ram` | - | `4096` | Memory in MB |
+| disk_size | `--disk-size` | - | `20G` | Disk size |
+| format | `--format` | `-f` | `qcow2` | Export format (qcow2, raw) |
+| ssh_port | `--ssh-port` | - | `2222` | SSH port |
+| ssh_user | `--ssh-user` | - | `root` | SSH user |
 
 ## Ephemeral Testing
 
@@ -65,20 +63,23 @@ Quick test that auto-deletes VM on exit:
 # Test default bazzite-ai image
 ujust bootc test
 
-# Test specific image
-ujust bootc test ghcr.io/org/image:tag
+# Test specific image (long form)
+ujust bootc test --image=ghcr.io/org/image:tag
+
+# Test specific image (short form)
+ujust bootc test -i ghcr.io/org/image:tag
 
 # Test with more resources
-ujust bootc test IMAGE=myimage CPUS=4 RAM=8192
+ujust bootc test --image=myimage --cpus=4 --ram=8192
 
+# Short form
+ujust bootc test -i myimage --cpus=4 --ram=8192
 ```
 
 Ephemeral mode:
 
 - Creates temporary VM
-
 - Boots to console
-
 - VM deleted when console exits
 
 ## Persistent VMs
@@ -89,12 +90,14 @@ Create VMs that persist across sessions:
 # Create VM with default image
 ujust bootc add dev
 
-# Create with specific image
-ujust bootc add testing IMAGE=ghcr.io/org/image:testing
+# Create with specific image (long form)
+ujust bootc add testing --image=ghcr.io/org/image:testing
+
+# Create with specific image (short form)
+ujust bootc add testing -i ghcr.io/org/image:testing
 
 # Custom resources
-ujust bootc add heavy CPUS=8 RAM=16384 DISK_SIZE=100G
-
+ujust bootc add heavy --cpus=8 --ram=16384 --disk-size=100G
 ```
 
 ### Manage Persistent VMs
@@ -108,7 +111,6 @@ ujust bootc stop dev
 
 # Delete VM
 ujust bootc delete dev
-
 ```
 
 ## Connecting to VMs
@@ -119,12 +121,11 @@ ujust bootc delete dev
 # Connect to VM
 ujust bootc ssh dev
 
-# Run command
+# Run command (use -- separator)
 ujust bootc ssh dev -- systemctl status
 
 # Different user
-ujust bootc ssh dev SSH_USER=admin
-
+ujust bootc ssh dev --ssh-user=admin
 ```
 
 Default: `ssh -p 2222 root@localhost`
@@ -133,24 +134,20 @@ Default: `ssh -p 2222 root@localhost`
 
 ```bash
 ujust bootc list
-
 ```
 
 Output:
 
 ```
-
 NAME         STATE    IMAGE
 dev          running  ghcr.io/org/image:latest
 testing      stopped  ghcr.io/org/image:testing
-
 ```
 
 ### Check Status
 
 ```bash
 ujust bootc status dev
-
 ```
 
 ## Export Disk Images
@@ -158,24 +155,23 @@ ujust bootc status dev
 Convert bootable container to disk image:
 
 ```bash
-# Export to QCOW2
-ujust bootc export ghcr.io/org/image:tag
+# Export to QCOW2 (long form)
+ujust bootc export --image=ghcr.io/org/image:tag
 
-# Export to raw
-ujust bootc export ghcr.io/org/image:tag FORMAT=raw
+# Export to QCOW2 (short form)
+ujust bootc export -i ghcr.io/org/image:tag
 
-# Export to ISO
-ujust bootc export ghcr.io/org/image:tag FORMAT=iso
+# Export to raw (long form)
+ujust bootc export --image=ghcr.io/org/image:tag --format=raw
 
+# Export to raw (short form)
+ujust bootc export -i ghcr.io/org/image:tag -f raw
 ```
 
 Supported formats:
 
 - `qcow2` - QEMU disk image
-
 - `raw` - Raw disk image
-
-- `iso` - Bootable ISO
 
 ## Common Workflows
 
@@ -183,16 +179,21 @@ Supported formats:
 
 ```bash
 # Test ephemeral (no cleanup needed)
-ujust bootc test ghcr.io/myorg/myimage:dev
+ujust bootc test --image=ghcr.io/myorg/myimage:dev
 # Exit console to destroy VM
 
+# Short form
+ujust bootc test -i ghcr.io/myorg/myimage:dev
 ```
 
 ### Development Environment
 
 ```bash
-# Create persistent VM
-ujust bootc add dev IMAGE=ghcr.io/myorg/myimage:latest
+# Create persistent VM (long form)
+ujust bootc add dev --image=ghcr.io/myorg/myimage:latest
+
+# Or short form
+ujust bootc add dev -i ghcr.io/myorg/myimage:latest
 
 # Start it
 ujust bootc start dev
@@ -204,29 +205,29 @@ ujust bootc ssh dev
 
 # Stop when done
 ujust bootc stop dev
-
 ```
 
 ### Test Before Release
 
 ```bash
 # Test testing branch
-ujust bootc test ghcr.io/myorg/myimage:testing
+ujust bootc test --image=ghcr.io/myorg/myimage:testing
 
 # If good, test stable
-ujust bootc test ghcr.io/myorg/myimage:stable
-
+ujust bootc test --image=ghcr.io/myorg/myimage:stable
 ```
 
 ### Create Installation Media
 
 ```bash
-# Export to ISO for USB boot
-ujust bootc export ghcr.io/myorg/myimage:stable FORMAT=iso
+# Export to QCOW2 for cloud (long form)
+ujust bootc export --image=ghcr.io/myorg/myimage:stable --format=qcow2
 
-# Export to QCOW2 for cloud
-ujust bootc export ghcr.io/myorg/myimage:stable FORMAT=qcow2
+# Export to QCOW2 for cloud (short form)
+ujust bootc export -i ghcr.io/myorg/myimage:stable -f qcow2
 
+# Export to raw for disk imaging
+ujust bootc export -i ghcr.io/myorg/myimage:stable -f raw
 ```
 
 ## bcvk vs vm Command
@@ -235,7 +236,7 @@ ujust bootc export ghcr.io/myorg/myimage:stable FORMAT=qcow2
 |---------|----------------------|----------------------|
 | Image source | Container images | QCOW2 files |
 | Ephemeral mode | Yes | No |
-| Export formats | qcow2/raw/iso | N/A |
+| Export formats | qcow2/raw | N/A |
 | SSH port | 2222 (fixed) | 4444 (configurable) |
 | Home sharing | No | Yes (virtiofs) |
 | Boot time | Faster | Slower |
@@ -244,17 +245,13 @@ ujust bootc export ghcr.io/myorg/myimage:stable FORMAT=qcow2
 **Use `bootc` when:**
 
 - Testing bootable container images
-
 - Quick ephemeral tests
-
 - Building disk images from containers
 
 **Use `vm` when:**
 
 - Need persistent VMs with home sharing
-
 - Need configurable ports
-
 - Need full libvirt features
 
 ## Troubleshooting
@@ -265,7 +262,6 @@ ujust bootc export ghcr.io/myorg/myimage:stable FORMAT=qcow2
 
 ```bash
 ujust install bcvk
-
 ```
 
 ### VM Won't Start
@@ -275,15 +271,12 @@ ujust install bcvk
 ```bash
 ujust bootc status dev
 ujust bootc list
-
 ```
 
 **Common causes:**
 
 - Image not pulled
-
 - Resource conflict
-
 - Disk full
 
 **Fix:**
@@ -291,7 +284,6 @@ ujust bootc list
 ```bash
 ujust bootc delete dev
 ujust bootc add dev
-
 ```
 
 ### SSH Connection Failed
@@ -300,15 +292,12 @@ ujust bootc add dev
 
 ```bash
 ssh -p 2222 root@localhost
-
 ```
 
 **Common causes:**
 
 - VM still booting
-
 - Port conflict (2222 used)
-
 - SSH not started
 
 **Fix:**
@@ -320,7 +309,6 @@ ujust bootc ssh dev
 
 # Or check console
 ujust bootc test  # Watch boot process
-
 ```
 
 ### Image Pull Failed
@@ -329,15 +317,12 @@ ujust bootc test  # Watch boot process
 
 ```bash
 podman pull ghcr.io/org/image:tag
-
 ```
 
 **Common causes:**
 
 - Network issue
-
 - Auth required
-
 - Image doesn't exist
 
 **Fix:**
@@ -350,25 +335,20 @@ podman login ghcr.io
 podman pull ghcr.io/org/image:tag
 
 # Retry
-ujust bootc add dev IMAGE=ghcr.io/org/image:tag
-
+ujust bootc add dev --image=ghcr.io/org/image:tag
 ```
 
 ## Cross-References
 
 - **Related Skills:** `vm` (traditional VMs), `install` (bcvk installation)
-
 - **Installation:** `ujust install bcvk`
-- **bcvk Docs:** [https://github.com/containers/bcvk](https://github.com/containers/bcvk)
+- **bcvk Docs:** <https://github.com/containers/bcvk>
 
 ## When to Use This Skill
 
 Use when the user asks about:
 
 - "bootc VM", "bootable container", "test container as VM"
-
 - "bcvk", "bootc virtualization"
-
 - "ephemeral VM", "quick test VM"
-
 - "export to qcow2", "create ISO from container"

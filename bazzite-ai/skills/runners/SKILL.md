@@ -19,17 +19,17 @@ The `runners` command manages self-hosted GitHub Actions runners using Podman Qu
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust runners config <REPO_URL> <N> [IMAGE] [WORKSPACE]` | Configure runner N for repo |
-| Start | `ujust runners start [N\|all]` | Start runner(s) |
-| Stop | `ujust runners stop [N\|all]` | Stop runner(s) |
-| Restart | `ujust runners restart [N\|all]` | Restart runner(s) |
-| Update | `ujust runners update [N\|all]` | Update to latest image |
+| Config | `ujust runners config --repo-url=<URL> --instance=<N>` | Configure runner N for repo |
+| Start | `ujust runners start [--instance=N\|all]` | Start runner(s) |
+| Stop | `ujust runners stop [--instance=N\|all]` | Stop runner(s) |
+| Restart | `ujust runners restart [--instance=N\|all]` | Restart runner(s) |
+| Update | `ujust runners update [--instance=N\|all]` | Update to latest image |
 | Rolling update | `ujust runners rolling-update` | Update with zero downtime |
-| Sync | `ujust runners sync [N]` | Sync config from source |
-| Logs | `ujust runners logs [N] [LINES]` | View logs |
+| Sync | `ujust runners sync [--instance=N]` | Sync config from source |
+| Logs | `ujust runners logs [--instance=N] [--lines=...]` | View logs |
 | List | `ujust runners list` | List all runners |
-| Shell | `ujust runners shell [CMD] [N]` | Open shell in container |
-| Delete | `ujust runners delete [N\|all]` | Remove runner(s) and images |
+| Shell | `ujust runners shell [--instance=N] [-- CMD...]` | Open shell in container |
+| Delete | `ujust runners delete [--instance=N\|all]` | Remove runner(s) and images |
 
 ## Prerequisites
 
@@ -43,45 +43,43 @@ gh auth status
 
 ## Configuration
 
-### Config Parameters
+### Parameters
 
-```bash
-ujust runners config <REPO_URL> <INSTANCE> [IMAGE] [WORKSPACE]
-```
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `REPO_URL` | Yes | GitHub repository URL |
-| `INSTANCE` | Yes | Instance number (1, 2, 3...) |
-| `IMAGE` | No | Container image or tag (default: stable) |
-| `WORKSPACE` | No | Optional additional mount to /workspace |
+| Parameter | Long Flag | Short | Required | Description |
+|-----------|-----------|-------|----------|-------------|
+| Repo URL | `--repo-url` | `-r` | Yes | GitHub repository URL |
+| Instance | `--instance` | `-n` | Yes | Instance number (1, 2, 3...) |
+| Image | `--image` | `-i` | No | Container image |
+| Tag | `--tag` | `-t` | No | Image tag (default: stable) |
+| Workspace | `--workspace-dir` | `-w` | No | Optional mount to /workspace |
+| Lines | `--lines` | `-l` | No | Log lines to show |
 
 ### Configuration Examples
 
 ```bash
-# Basic runner
-ujust runners config https://github.com/owner/repo 1
+# Basic runner (long form)
+ujust runners config --repo-url=https://github.com/owner/repo --instance=1
+
+# Basic runner (short form)
+ujust runners config -r https://github.com/owner/repo -n 1
 
 # Runner with testing tag
-ujust runners config https://github.com/owner/repo 1 testing
+ujust runners config -r https://github.com/owner/repo -n 1 --tag=testing
 
 # Runner with workspace mount
-ujust runners config https://github.com/owner/repo 1 latest /home/user
-
-# Custom image with workspace
-ujust runners config https://github.com/owner/repo 1 "ghcr.io/custom/runner:v1" /projects
+ujust runners config -r https://github.com/owner/repo -n 1 --workspace-dir=/home/user
 ```
 
 ### Install Multiple Runners
 
 ```bash
 # Runner pool for a repository
-ujust runners config https://github.com/owner/repo 1
-ujust runners config https://github.com/owner/repo 2
-ujust runners config https://github.com/owner/repo 3
+ujust runners config -r https://github.com/owner/repo -n 1
+ujust runners config -r https://github.com/owner/repo -n 2
+ujust runners config -r https://github.com/owner/repo -n 3
 
 # Start all
-ujust runners start all
+ujust runners start --instance=all
 ```
 
 ### Update Existing Configuration
@@ -94,11 +92,11 @@ Running `config` when already configured will update the existing configuration,
 # Interactive bash shell
 ujust runners shell
 
-# Run specific command
-ujust runners shell "df -h"
+# Run specific command (use -- separator)
+ujust runners shell -- df -h
 
 # Shell in specific instance
-ujust runners shell "cat /config/runner.env" 2
+ujust runners shell --instance=2 -- cat /config/runner.env
 ```
 
 ## Lifecycle Commands
@@ -107,19 +105,23 @@ ujust runners shell "cat /config/runner.env" 2
 
 ```bash
 # Single runner
-ujust runners start 1
-ujust runners stop 1
+ujust runners start --instance=1
+ujust runners stop --instance=1
+
+# Short form
+ujust runners start -n 1
+ujust runners stop -n 1
 
 # All runners
-ujust runners start all
-ujust runners stop all
+ujust runners start --instance=all
+ujust runners stop --instance=all
 ```
 
 ### Updates
 
 ```bash
 # Fast update (stops runner briefly)
-ujust runners update 1
+ujust runners update --instance=1
 
 # Rolling update (zero-downtime)
 ujust runners rolling-update
@@ -137,10 +139,13 @@ Rolling update:
 
 ```bash
 # Follow logs
-ujust runners logs 1
+ujust runners logs
 
-# Last N lines
-ujust runners logs 1 100
+# Specific instance with line count
+ujust runners logs --instance=1 --lines=100
+
+# Short form
+ujust runners logs -n 1 -l 100
 ```
 
 ## Token Management
@@ -193,10 +198,10 @@ Runners access host container cache (read-only):
 gh auth login
 
 # 2. Configure runner
-ujust runners config https://github.com/myorg/myrepo 1
+ujust runners config -r https://github.com/myorg/myrepo -n 1
 
 # 3. Start runner
-ujust runners start 1
+ujust runners start
 
 # 4. Verify in GitHub
 # Settings → Actions → Runners
@@ -206,11 +211,11 @@ ujust runners start 1
 
 ```bash
 # Add more runners
-ujust runners config https://github.com/myorg/myrepo 2
-ujust runners config https://github.com/myorg/myrepo 3
+ujust runners config -r https://github.com/myorg/myrepo -n 2
+ujust runners config -r https://github.com/myorg/myrepo -n 3
 
 # Start all
-ujust runners start all
+ujust runners start --instance=all
 
 # List pool
 ujust runners list
@@ -220,9 +225,9 @@ ujust runners list
 
 ```bash
 # Option 1: Fast update (brief downtime)
-ujust runners stop all
-ujust runners update all
-ujust runners start all
+ujust runners stop --instance=all
+ujust runners update --instance=all
+ujust runners start --instance=all
 
 # Option 2: Rolling update (zero downtime)
 ujust runners rolling-update
@@ -232,11 +237,11 @@ ujust runners rolling-update
 
 ```bash
 # Delete runner
-ujust runners delete 1
+ujust runners delete --instance=1
 
 # Reconfigure
-ujust runners config https://github.com/myorg/myrepo 1
-ujust runners start 1
+ujust runners config -r https://github.com/myorg/myrepo -n 1
+ujust runners start
 ```
 
 ## Workflow Labels
@@ -261,8 +266,8 @@ runs-on: [self-hosted, bazzite-ai]
 **Check:**
 
 ```bash
-ujust runners status 1
-ujust runners logs 1 50
+ujust runners status
+ujust runners logs --lines=50
 ```
 
 **Common causes:**
@@ -278,8 +283,8 @@ ujust runners logs 1 50
 gh auth login
 
 # Reconfigure runner
-ujust runners delete 1
-ujust runners config https://github.com/owner/repo 1
+ujust runners delete --instance=1
+ujust runners config -r https://github.com/owner/repo -n 1
 ```
 
 ### Jobs Not Running
@@ -289,7 +294,7 @@ ujust runners config https://github.com/owner/repo 1
 **Check:**
 
 ```bash
-ujust runners logs 1
+ujust runners logs
 ```
 
 **Common causes:**
@@ -304,7 +309,7 @@ ujust runners logs 1
 
 ```bash
 systemctl --user status github-runner-1
-ujust runners logs 1 100
+ujust runners logs --lines=100
 ```
 
 **Common causes:**

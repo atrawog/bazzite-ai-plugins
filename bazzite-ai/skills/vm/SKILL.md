@@ -19,41 +19,38 @@ The `vm` command manages bazzite-ai virtual machines using libvirt. VMs are crea
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Add VM | `ujust vm add [NAME] [PARAMS...]` | Download + create VM |
-| Update VM | `ujust vm update [NAME] [WHAT=...]` | Update VM config |
+| Add VM | `ujust vm add [NAME] [--cpus=...] [--ram=...]` | Download + create VM |
+| Update VM | `ujust vm update [NAME] [--what=...]` | Update VM config |
 | Delete VM | `ujust vm delete [NAME]` | Remove VM |
-| Download | `ujust vm download [BRANCH]` | Download QCOW2 image |
-| Seed | `ujust vm seed [NAME] [PARAMS...]` | Create cloud-init ISO |
-| Create | `ujust vm create [NAME] [PARAMS...]` | Create VM from image |
+| Download | `ujust vm download [--branch=...]` | Download QCOW2 image |
+| Seed | `ujust vm seed [NAME] [--username=...]` | Create cloud-init ISO |
+| Create | `ujust vm create [NAME] [--cpus=...] [--ram=...]` | Create VM from image |
 | Start | `ujust vm start [NAME]` | Start VM |
 | Stop | `ujust vm stop [NAME]` | Stop VM |
-| SSH | `ujust vm ssh [NAME]` | SSH to VM |
+| SSH | `ujust vm ssh [NAME] [--ssh-user=...]` | SSH to VM |
 | VNC | `ujust vm vnc [NAME]` | Open VNC viewer |
 | Status | `ujust vm status [NAME]` | Show VM status |
 | Help | `ujust vm help` | Show help |
 
 ## Parameters
 
-### Command Pattern
-
-```bash
-ujust vm ACTION VM_NAME PARAM1=value PARAM2=value...
-
-```
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `URL` | R2 CDN URL | QCOW2 image URL |
-| `CPUS` | `4` | Number of CPUs |
-| `RAM` | `8192` | Memory in MB |
-| `DISK_SIZE` | `100G` | Disk size |
-| `USERNAME` | `$USER` | VM username |
-| `PASSWORD` | (empty) | VM password |
-| `AUTOLOGIN` | `true` | Enable autologin |
-| `SSH_PORT` | `4444` | SSH port forwarding |
-| `VNC_PORT` | `5900` | VNC port |
-| `SHARE_DIR` | `$HOME` | Directory to share |
-| `BRANCH` | `stable` | Image branch (stable/testing) |
+| Parameter | Long Flag | Short | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| action | (positional) | - | required | Action: add, update, delete, download, etc. |
+| vm_name | (positional) | - | `bazzite-ai` | VM name |
+| url | `--url` | - | R2 CDN URL | QCOW2 image URL |
+| cpus | `--cpus` | - | `4` | Number of CPUs |
+| ram | `--ram` | - | `8192` | Memory in MB |
+| disk_size | `--disk-size` | - | `100G` | Disk size |
+| username | `--username` | `-u` | `$USER` | VM username |
+| password | `--password` | - | (empty) | VM password |
+| autologin | `--autologin` | - | `true` | Enable autologin |
+| ssh_port | `--ssh-port` | - | `4444` | SSH port forwarding |
+| vnc_port | `--vnc-port` | - | `5900` | VNC port |
+| ssh_user | `--ssh-user` | - | `$USER` | SSH user for connection |
+| share_dir | `--share-dir` | - | `$HOME` | Directory to share |
+| branch | `--branch` | `-b` | `stable` | Image branch (stable/testing) |
+| what | `--what` | - | - | Update target (for update action) |
 
 ## Add VM (Full Workflow)
 
@@ -61,18 +58,20 @@ ujust vm ACTION VM_NAME PARAM1=value PARAM2=value...
 # Default: bazzite-ai VM with auto-detect settings
 ujust vm add
 
-# Named VM with custom config
-ujust vm add myvm CPUS=8 RAM=16384 DISK_SIZE=200G
+# Named VM with custom config (long form)
+ujust vm add myvm --cpus=8 --ram=16384 --disk-size=200G
 
 # Testing branch image
-ujust vm add testing-vm BRANCH=testing
+ujust vm add testing-vm --branch=testing
+
+# Short form for branch
+ujust vm add testing-vm -b testing
 
 # Different SSH port
-ujust vm add dev-vm SSH_PORT=4445
+ujust vm add dev-vm --ssh-port=4445
 
 # No home sharing
-ujust vm add isolated SHARE_DIR=''
-
+ujust vm add isolated --share-dir=''
 ```
 
 The `add` command:
@@ -87,28 +86,33 @@ The `add` command:
 ### Download QCOW2
 
 ```bash
-# Stable image
+# Stable image (default)
 ujust vm download
 
-# Testing branch
-ujust vm download testing
+# Testing branch (long form)
+ujust vm download --branch=testing
+
+# Testing branch (short form)
+ujust vm download -b testing
 
 # Custom URL
-ujust vm download URL=[https://example.com/custom.qcow2]([https://example.com/custom.qcow2](https://example.com/custom.qcow2))
+ujust vm download --url=https://example.com/custom.qcow2
 ```
 
 ### Create Seed ISO
 
 ```bash
-ujust vm seed myvm USERNAME=developer PASSWORD=secret
+# Long form
+ujust vm seed myvm --username=developer --password=secret
 
+# Short form for username
+ujust vm seed myvm -u developer --password=secret
 ```
 
 ### Create VM
 
 ```bash
-ujust vm create myvm CPUS=4 RAM=8192
-
+ujust vm create myvm --cpus=4 --ram=8192
 ```
 
 ## VM Lifecycle
@@ -118,7 +122,6 @@ ujust vm create myvm CPUS=4 RAM=8192
 ```bash
 ujust vm start              # Default VM
 ujust vm start myvm         # Named VM
-
 ```
 
 Auto-adds VM if it doesn't exist.
@@ -127,15 +130,13 @@ Auto-adds VM if it doesn't exist.
 
 ```bash
 ujust vm stop              # Graceful shutdown
-ujust vm stop myvm FORCE=yes  # Force stop
-
+ujust vm stop myvm         # Named VM
 ```
 
 ### Delete VM
 
 ```bash
 ujust vm delete myvm        # Remove VM and disk
-
 ```
 
 ## Connecting to VM
@@ -143,18 +144,17 @@ ujust vm delete myvm        # Remove VM and disk
 ### SSH Connection
 
 ```bash
-# Connect to VM
+# Connect to default VM
 ujust vm ssh
 
 # Named VM
 ujust vm ssh myvm
 
 # Different user
-ujust vm ssh myvm SSH_USER=root
+ujust vm ssh myvm --ssh-user=root
 
-# Run command
+# Run command (use -- separator)
 ujust vm ssh myvm -- ls -la
-
 ```
 
 Default SSH: `ssh -p 4444 localhost`
@@ -164,7 +164,6 @@ Default SSH: `ssh -p 4444 localhost`
 ```bash
 ujust vm vnc              # Opens VNC viewer
 ujust vm vnc myvm
-
 ```
 
 Default VNC: Port 5900
@@ -178,18 +177,16 @@ By default, your home directory is shared to the VM at `/workspace` via virtiofs
 ujust vm add
 
 # Disable sharing
-ujust vm add isolated SHARE_DIR=''
+ujust vm add isolated --share-dir=''
 
 # Share specific directory
-ujust vm add project SHARE_DIR=/path/to/project
-
+ujust vm add project --share-dir=/path/to/project
 ```
 
 Inside VM:
 
 ```bash
 ls /workspace  # Your home directory
-
 ```
 
 ## Image Branches
@@ -200,9 +197,13 @@ ls /workspace  # Your home directory
 | `testing` | `:testing` | Latest features |
 
 ```bash
-ujust vm download stable
-ujust vm download testing
+# Long form
+ujust vm download --branch=stable
+ujust vm download --branch=testing
 
+# Short form
+ujust vm download -b stable
+ujust vm download -b testing
 ```
 
 ## Storage Locations
@@ -223,14 +224,13 @@ ujust vm download testing
 ujust vm add
 ujust vm start
 ujust vm ssh
-
 ```
 
 ### Development Environment
 
 ```bash
 # Create dev VM with more resources
-ujust vm add dev CPUS=8 RAM=16384 DISK_SIZE=200G
+ujust vm add dev --cpus=8 --ram=16384 --disk-size=200G
 
 # Start it
 ujust vm start dev
@@ -239,30 +239,31 @@ ujust vm start dev
 ujust vm ssh dev
 
 # Your home is at /workspace
-
 ```
 
 ### Testing Branch
 
 ```bash
-# Test latest features
-ujust vm add testing-vm BRANCH=testing
+# Test latest features (long form)
+ujust vm add testing-vm --branch=testing
+
+# Or short form
+ujust vm add testing-vm -b testing
+
 ujust vm start testing-vm
 ujust vm ssh testing-vm
-
 ```
 
 ### Multiple VMs
 
 ```bash
 # Create VMs on different ports
-ujust vm add dev1 SSH_PORT=4444
-ujust vm add dev2 SSH_PORT=4445
-ujust vm add dev3 SSH_PORT=4446
+ujust vm add dev1 --ssh-port=4444
+ujust vm add dev2 --ssh-port=4445
+ujust vm add dev3 --ssh-port=4446
 
 # Start all (not a built-in command, use loop)
 for vm in dev1 dev2 dev3; do ujust vm start $vm; done
-
 ```
 
 ## Troubleshooting
@@ -274,15 +275,12 @@ for vm in dev1 dev2 dev3; do ujust vm start $vm; done
 ```bash
 ujust vm status myvm
 virsh --connect qemu:///session list --all
-
 ```
 
 **Common causes:**
 
 - Disk image not found
-
 - Port conflict
-
 - Virtiofs path issue
 
 **Fix:**
@@ -290,7 +288,6 @@ virsh --connect qemu:///session list --all
 ```bash
 ujust vm delete myvm
 ujust vm add myvm
-
 ```
 
 ### SSH Connection Refused
@@ -299,15 +296,12 @@ ujust vm add myvm
 
 ```bash
 ssh -p 4444 localhost
-
 ```
 
 **Common causes:**
 
 - VM not fully booted
-
 - Wrong SSH port
-
 - SSH not started in VM
 
 **Fix:**
@@ -319,7 +313,6 @@ ujust vm ssh myvm
 
 # Check VM console via VNC
 ujust vm vnc myvm
-
 ```
 
 ### Virtiofs Not Working
@@ -333,8 +326,7 @@ ujust vm vnc myvm
 ```bash
 # Delete and recreate with canonical path
 ujust vm delete myvm
-ujust vm add myvm SHARE_DIR=$(readlink -f $HOME)
-
+ujust vm add myvm --share-dir=$(readlink -f $HOME)
 ```
 
 ### Out of Disk Space
@@ -343,7 +335,6 @@ ujust vm add myvm SHARE_DIR=$(readlink -f $HOME)
 
 ```bash
 qemu-img info ~/.local/share/libvirt/images/myvm.qcow2
-
 ```
 
 **Fix:**
@@ -351,16 +342,13 @@ qemu-img info ~/.local/share/libvirt/images/myvm.qcow2
 ```bash
 # Create new VM with larger disk
 ujust vm delete myvm
-ujust vm add myvm DISK_SIZE=200G
-
+ujust vm add myvm --disk-size=200G
 ```
 
 ## Cross-References
 
 - **Related Skills:** `bootc` (alternative: bootc-based VMs)
-
 - **Prerequisites:** `ujust config libvirtd enable`
-
 - **bcvk alternative:** `ujust install bcvk` + `ujust bootc`
 
 ## When to Use This Skill
@@ -368,11 +356,7 @@ ujust vm add myvm DISK_SIZE=200G
 Use when the user asks about:
 
 - "create VM", "add VM", "start VM"
-
 - "ssh to VM", "connect to VM"
-
 - "download qcow2", "VM image"
-
 - "VM not starting", "VM connection failed"
-
 - "share directory with VM", "virtiofs"

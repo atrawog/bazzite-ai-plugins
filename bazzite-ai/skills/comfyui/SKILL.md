@@ -19,39 +19,39 @@ ComfyUI is a powerful node-based Stable Diffusion interface for AI image generat
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust comfyui config [MODELS] [OUTPUT] [INPUT] [NODES] [PORT] [GPU] [IMAGE] [WORKSPACE]` | Configure ComfyUI |
+| Config | `ujust comfyui config [--models-dir=...] [--output-dir=...] [--port=...]` | Configure ComfyUI |
 | Start | `ujust comfyui start` | Start ComfyUI server |
 | Stop | `ujust comfyui stop` | Stop ComfyUI server |
 | Restart | `ujust comfyui restart` | Restart ComfyUI server |
 | Status | `ujust comfyui status` | Show status and model counts |
-| Logs | `ujust comfyui logs` | View service logs |
+| Logs | `ujust comfyui logs [--lines=...]` | View service logs |
 | Open | `ujust comfyui open` | Open UI in browser |
-| Shell | `ujust comfyui shell [CMD] [INSTANCE]` | Open shell in container |
-| Download model | `ujust comfyui download <url> <type>` | Download from CivitAI |
+| Shell | `ujust comfyui shell [-- CMD...]` | Open shell in container |
+| Download model | `ujust comfyui download --model-url=<url> --model-type=<type>` | Download from CivitAI |
 | List models | `ujust comfyui models` | List installed models |
-| Install node | `ujust comfyui node-install <url>` | Install custom node |
+| Install node | `ujust comfyui node-install --node-url=<url>` | Install custom node |
 | List nodes | `ujust comfyui node-list` | List custom nodes |
 | Update nodes | `ujust comfyui node-update` | Update all nodes |
 | Delete | `ujust comfyui delete` | Remove ComfyUI and images |
 
 ## Configuration
 
-### Config Parameters
+### Parameters
 
-```bash
-ujust comfyui config [MODELS_DIR] [OUTPUT_DIR] [INPUT_DIR] [CUSTOM_NODES_DIR] [PORT] [GPU] [IMAGE] [WORKSPACE]
-```
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `MODELS_DIR` | (empty) | Path for SD models - ephemeral if not set |
-| `OUTPUT_DIR` | (empty) | Path for generated images - ephemeral if not set |
-| `INPUT_DIR` | (empty) | Path for input images - ephemeral if not set |
-| `CUSTOM_NODES_DIR` | (empty) | Path for custom nodes - ephemeral if not set |
-| `PORT` | `8188` | Web UI port |
-| `GPU` | `auto` | GPU type: nvidia/amd/intel/auto |
-| `IMAGE` | `stable` | Container image or tag |
-| `WORKSPACE` | (empty) | Optional additional mount to /workspace |
+| Parameter | Long Flag | Short | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| Port | `--port` | `-p` | `8188` | Web UI port |
+| GPU Type | `--gpu-type` | `-g` | `auto` | GPU: nvidia/amd/intel/auto |
+| Image | `--image` | `-i` | (default image) | Container image |
+| Tag | `--tag` | `-t` | `stable` | Image tag |
+| Models Dir | `--models-dir` | - | (empty) | Path for SD models |
+| Output Dir | `--output-dir` | - | (empty) | Path for generated images |
+| Input Dir | `--input-dir` | - | (empty) | Path for input images |
+| Nodes Dir | `--nodes-dir` | - | (empty) | Path for custom nodes |
+| Workspace | `--workspace-dir` | `-w` | (empty) | Optional mount to /workspace |
+| Bind | `--bind` | `-b` | `127.0.0.1` | Bind address |
+| Lines | `--lines` | `-l` | `50` | Log lines to show |
+| Instance | `--instance` | `-n` | `1` | Instance number |
 
 **Important:** All directory parameters default to empty. When empty, data is stored inside the container and will be **lost when the container is recreated**. For persistent storage, provide explicit paths.
 
@@ -62,19 +62,23 @@ ujust comfyui config [MODELS_DIR] [OUTPUT_DIR] [INPUT_DIR] [CUSTOM_NODES_DIR] [P
 ujust comfyui config
 
 # Persist models only (most common)
-ujust comfyui config /data/models
+ujust comfyui config --models-dir=/data/models
 
 # Persist models and output
-ujust comfyui config /data/models /data/output
+ujust comfyui config --models-dir=/data/models --output-dir=/data/output
 
-# Persist models and custom_nodes (skip output and input)
-ujust comfyui config /data/models '' '' /data/nodes
+# Persist models and custom_nodes
+ujust comfyui config --models-dir=/data/models --nodes-dir=/data/nodes
 
 # All directories with custom port and GPU
-ujust comfyui config /data/models /data/output /data/input /data/nodes 8189 nvidia
+ujust comfyui config --models-dir=/data/models --output-dir=/data/output \
+  --input-dir=/data/input --nodes-dir=/data/nodes --port=8189 --gpu-type=nvidia
 
-# Full configuration with workspace
-ujust comfyui config /ssd/models /hdd/output /data/input /data/nodes 8188 nvidia stable /home/user
+# With short forms
+ujust comfyui config -p 8189 -g nvidia --models-dir=/data/models
+
+# Network-wide access
+ujust comfyui config --bind=0.0.0.0
 ```
 
 ### Update Existing Configuration
@@ -86,7 +90,7 @@ Running `config` when already configured will update the existing configuration,
 ujust comfyui config
 
 # Later, add models directory (other settings preserved)
-ujust comfyui config /data/models
+ujust comfyui config --models-dir=/data/models
 ```
 
 ### Shell Access
@@ -95,9 +99,9 @@ ujust comfyui config /data/models
 # Interactive bash shell
 ujust comfyui shell
 
-# Run specific command
-ujust comfyui shell "pip list"
-ujust comfyui shell "nvidia-smi"
+# Run specific command (use -- separator)
+ujust comfyui shell -- pip list
+ujust comfyui shell -- nvidia-smi
 ```
 
 ## Model Downloads
@@ -105,15 +109,15 @@ ujust comfyui shell "nvidia-smi"
 ### download
 
 ```bash
-ujust comfyui download <URL> <TYPE>
+ujust comfyui download --model-url=<URL> --model-type=<TYPE>
 ```
 
-| Parameter | Description |
-|-----------|-------------|
-| `URL` | CivitAI URL, model ID, or direct download URL |
-| `TYPE` | Model type (see below) |
+| Parameter | Flag | Description |
+|-----------|------|-------------|
+| URL | `--model-url` | CivitAI URL, model ID, or direct download URL |
+| Type | `--model-type` | Model type (see below) |
 
-**Requires:** `MODELS_DIR` must be configured (not ephemeral)
+**Requires:** `--models-dir` must be configured (not ephemeral)
 
 **Model Types:**
 
@@ -130,16 +134,16 @@ ujust comfyui download <URL> <TYPE>
 
 ```bash
 # By CivitAI URL
-ujust comfyui download https://civitai.com/models/101055 checkpoint
+ujust comfyui download --model-url=https://civitai.com/models/101055 --model-type=checkpoint
 
 # By model ID
-ujust comfyui download 101055 checkpoint
+ujust comfyui download --model-url=101055 --model-type=checkpoint
 
 # LoRA model
-ujust comfyui download 123456 lora
+ujust comfyui download --model-url=123456 --model-type=lora
 
 # Direct URL
-ujust comfyui download https://example.com/model.safetensors vae
+ujust comfyui download --model-url=https://example.com/model.safetensors --model-type=vae
 ```
 
 ## Custom Nodes
@@ -147,26 +151,26 @@ ujust comfyui download https://example.com/model.safetensors vae
 ### node-install
 
 ```bash
-ujust comfyui node-install <GIT_URL>
+ujust comfyui node-install --node-url=<GIT_URL>
 ```
 
-**Requires:** `CUSTOM_NODES_DIR` must be configured (not ephemeral)
+**Requires:** `--nodes-dir` must be configured (not ephemeral)
 
-| Parameter | Description |
-|-----------|-------------|
-| `GIT_URL` | Git repository URL for custom node |
+| Parameter | Flag | Description |
+|-----------|------|-------------|
+| GIT_URL | `--node-url` | Git repository URL for custom node |
 
 ### Popular Custom Nodes
 
 ```bash
 # ComfyUI-Manager (recommended)
-ujust comfyui node-install https://github.com/ltdrdata/ComfyUI-Manager
+ujust comfyui node-install --node-url=https://github.com/ltdrdata/ComfyUI-Manager
 
 # Impact Pack
-ujust comfyui node-install https://github.com/ltdrdata/ComfyUI-Impact-Pack
+ujust comfyui node-install --node-url=https://github.com/ltdrdata/ComfyUI-Impact-Pack
 
 # ControlNet Aux
-ujust comfyui node-install https://github.com/Fannovel16/comfyui_controlnet_aux
+ujust comfyui node-install --node-url=https://github.com/Fannovel16/comfyui_controlnet_aux
 
 # List installed nodes
 ujust comfyui node-list
@@ -209,10 +213,10 @@ When directories are configured, they are mounted into the container:
 
 ```bash
 # 1. Configure with persistent models directory
-ujust comfyui config /data/comfyui/models
+ujust comfyui config --models-dir=/data/comfyui/models
 
 # 2. Download a checkpoint model
-ujust comfyui download https://civitai.com/models/101055 checkpoint
+ujust comfyui download --model-url=https://civitai.com/models/101055 --model-type=checkpoint
 
 # 3. Start ComfyUI
 ujust comfyui start
@@ -288,10 +292,10 @@ ujust comfyui config /data/models
 
 ```bash
 # Add models directory
-ujust comfyui config /path/to/models
+ujust comfyui config --models-dir=/path/to/models
 
 # Or add both models and custom_nodes
-ujust comfyui config /path/to/models '' '' /path/to/nodes
+ujust comfyui config --models-dir=/path/to/models --nodes-dir=/path/to/nodes
 ```
 
 ### Model Not Appearing
@@ -346,7 +350,7 @@ nvidia-smi
 
 # Delete and reconfigure
 ujust comfyui delete
-ujust comfyui config /data/models
+ujust comfyui config --models-dir=/data/models
 ```
 
 ## Configuration Files
