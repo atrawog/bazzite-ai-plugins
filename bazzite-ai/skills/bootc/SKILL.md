@@ -19,7 +19,7 @@ The `bootc` command manages bootable container VMs using bcvk (bootc virtualizat
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Test | `ujust bootc test [--image=...] [--cpus=...]` | Ephemeral VM (deleted on exit) |
+| Test | `ujust test bootc [--image=...] [--cpus=...]` | Ephemeral VM (deleted on exit) |
 | Add | `ujust bootc add [NAME] [--image=...] [--cpus=...]` | Create persistent VM |
 | List | `ujust bootc list` | List all VMs |
 | Status | `ujust bootc status [NAME]` | Show VM status |
@@ -45,7 +45,7 @@ bcvk --version
 
 | Parameter | Long Flag | Short | Default | Description |
 |-----------|-----------|-------|---------|-------------|
-| action | (positional) | - | required | Action: test, add, list, status, ssh, etc. |
+| action | (positional) | - | required | Action: add, list, status, ssh, etc. |
 | vm_name | (positional) | - | `bazzite-bootc` | VM name |
 | image | `--image` | `-i` | (varies) | Container image to boot |
 | cpus | `--cpus` | - | `2` | Number of CPUs |
@@ -61,19 +61,19 @@ Quick test that auto-deletes VM on exit:
 
 ```bash
 # Test default bazzite-ai image
-ujust bootc test
+ujust test bootc
 
 # Test specific image (long form)
-ujust bootc test --image=ghcr.io/org/image:tag
+ujust test bootc --image=ghcr.io/org/image:tag
 
 # Test specific image (short form)
-ujust bootc test -i ghcr.io/org/image:tag
+ujust test bootc -i ghcr.io/org/image:tag
 
 # Test with more resources
-ujust bootc test --image=myimage --cpus=4 --ram=8192
+ujust test bootc --image=myimage --cpus=4 --ram=8192
 
 # Short form
-ujust bootc test -i myimage --cpus=4 --ram=8192
+ujust test bootc -i myimage --cpus=4 --ram=8192
 ```
 
 Ephemeral mode:
@@ -179,11 +179,11 @@ Supported formats:
 
 ```bash
 # Test ephemeral (no cleanup needed)
-ujust bootc test --image=ghcr.io/myorg/myimage:dev
+ujust test bootc --image=ghcr.io/myorg/myimage:dev
 # Exit console to destroy VM
 
 # Short form
-ujust bootc test -i ghcr.io/myorg/myimage:dev
+ujust test bootc -i ghcr.io/myorg/myimage:dev
 ```
 
 ### Development Environment
@@ -211,10 +211,10 @@ ujust bootc stop dev
 
 ```bash
 # Test testing branch
-ujust bootc test --image=ghcr.io/myorg/myimage:testing
+ujust test bootc --image=ghcr.io/myorg/myimage:testing
 
 # If good, test stable
-ujust bootc test --image=ghcr.io/myorg/myimage:stable
+ujust test bootc --image=ghcr.io/myorg/myimage:stable
 ```
 
 ### Create Installation Media
@@ -308,7 +308,7 @@ sleep 30
 ujust bootc ssh dev
 
 # Or check console
-ujust bootc test  # Watch boot process
+ujust test bootc  # Watch boot process
 ```
 
 ### Image Pull Failed
