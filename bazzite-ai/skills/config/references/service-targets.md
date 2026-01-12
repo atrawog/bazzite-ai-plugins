@@ -125,31 +125,6 @@ ujust config passwordless-sudo enable
 
 ## Application Targets
 
-### Podman Permissions
-
-Configures Flatpak permissions for Podman Desktop.
-
-```bash
-ujust config podman-permissions enable
-
-```
-
-Grants access to:
-
-- `~/.local/share/containers/`
-
-- Podman socket
-
-### Podman Extensions
-
-Manages Podman Desktop extensions.
-
-```bash
-ujust config podman-extensions show
-ujust config podman-extensions open
-
-```
-
 ### WinBoat
 
 Windows application integration layer.

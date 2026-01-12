@@ -22,7 +22,7 @@ The `config` command is a unified dispatcher for system configuration tasks. It 
 | **Services** | `docker`, `cockpit`, `syncthing`, `libvirtd`, `sshd` |
 | **Desktop** | `gamemode`, `steam-autostart`, `shell` |
 | **Security** | `passwordless-sudo` |
-| **Apps** | `podman-permissions`, `podman-extensions`, `winboat` |
+| **Apps** | `winboat` |
 | **Development** | `gpu`, `dev-environment` |
 
 ## Parameters
@@ -148,23 +148,6 @@ ujust config passwordless-sudo disable  # Disable passwordless sudo
 
 ## Application Targets
 
-### Podman Permissions
-
-```bash
-ujust config podman-permissions status   # Show Podman access
-ujust config podman-permissions enable   # Grant Podman Desktop access
-ujust config podman-permissions disable  # Revoke access
-
-```
-
-### Podman Extensions
-
-```bash
-ujust config podman-extensions show      # List installed extensions
-ujust config podman-extensions open      # Open extension manager
-
-```
-
 ### WinBoat
 
 ```bash
@@ -287,20 +270,6 @@ sudo systemctl start <service>
 
 ```
 
-### Podman Permissions Not Working
-
-**Symptom:** Podman Desktop can't access podman
-
-**Cause:** Flatpak permissions not configured
-
-**Fix:**
-
-```bash
-ujust config podman-permissions enable
-# Restart Podman Desktop
-
-```
-
 ### GPU Containers Not Working
 
 **Symptom:** Containers can't access GPU
@@ -334,8 +303,6 @@ Use when the user asks about:
 - "passwordless sudo", "sudo without password"
 
 - "GPU containers", "container GPU access"
-
-- "podman permissions", "flatpak access"
 
 - "reset shell config", "restore bashrc", "default zshrc"
 
