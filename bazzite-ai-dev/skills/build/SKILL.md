@@ -31,8 +31,6 @@ The `build` command provides a unified interface for all bazzite-ai build operat
 | Build ISO | `just build iso` | Build live ISO installer |
 | Build QCOW2 | `just build qcow2` | Build QCOW2 VM image |
 | Build RAW | `just build raw` | Build RAW VM image |
-| Test pod | `just build test cuda` | Test CUDA functionality |
-| Test all | `just build test all` | Test all pod variants |
 | Generate lock | `just build pixi python` | Generate pixi.lock |
 | Push OS | `just build push os` | Push OS image to registry |
 | Push pod | `just build push pod nvidia` | Push pod to registry |
@@ -112,19 +110,6 @@ just build iso
 
 # Build RAW image
 just build raw
-```
-
-### Test Pods
-
-```bash
-# Test CUDA
-just build test cuda
-
-# Test DevOps tools
-just build test devops
-
-# All tests
-just build test all
 ```
 
 ### Push to Registry
@@ -294,7 +279,6 @@ Use when the user asks about:
 - "build os", "build image", "build container"
 - "build pod", "build nvidia", "build jupyter", "build comfyui"
 - "build iso", "build qcow2", "build vm"
-- "test cuda", "test pod", "test devops"
 - "push os", "push pod", "push to registry"
 - "sign image", "cosign", "sign pod"
 - "pixi lock", "generate lock"
