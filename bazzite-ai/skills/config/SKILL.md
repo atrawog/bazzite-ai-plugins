@@ -20,7 +20,7 @@ The `config` command is a unified dispatcher for system configuration tasks. It 
 | Category | Targets |
 |----------|---------|
 | **Services** | `docker`, `cockpit`, `syncthing`, `libvirtd`, `sshd` |
-| **Desktop** | `gamemode`, `steam-autostart` |
+| **Desktop** | `gamemode`, `steam-autostart`, `shell` |
 | **Security** | `passwordless-sudo` |
 | **Apps** | `podman-permissions`, `podman-extensions`, `winboat` |
 | **Development** | `gpu`, `dev-environment` |
@@ -111,6 +111,27 @@ ujust config steam-autostart enable   # Enable Steam autostart
 ujust config steam-autostart disable  # Disable Steam autostart
 
 ```
+
+### Shell Configuration
+
+Manages shell configuration files by synchronizing them with system skeleton defaults in `/etc/skel`.
+
+```bash
+ujust config shell status   # Check if configs match skeleton
+ujust config shell update   # Update all configs from /etc/skel (with backup)
+
+```
+
+**Managed files:**
+
+| File | Purpose |
+|------|---------|
+| `~/.bashrc` | Bash shell configuration |
+| `~/.zshrc` | Zsh shell configuration |
+| `~/.config/starship.toml` | Starship prompt config |
+| `~/.config/ghostty/` | Ghostty terminal config |
+
+**Backup location:** `~/.config-backup-shell-YYYYMMDD_HHMMSS/`
 
 ## Security Targets
 
@@ -315,3 +336,9 @@ Use when the user asks about:
 - "GPU containers", "container GPU access"
 
 - "podman permissions", "flatpak access"
+
+- "reset shell config", "restore bashrc", "default zshrc"
+
+- "starship not working", "prompt broken", "shell configuration"
+
+- "sync shell from skeleton", "ghostty config"
