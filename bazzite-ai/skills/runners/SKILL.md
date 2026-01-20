@@ -29,6 +29,7 @@ The `runners` command manages self-hosted GitHub Actions runners using Podman Qu
 | Logs | `ujust runners logs [--instance=N] [--lines=...]` | View logs |
 | List | `ujust runners list` | List all runners |
 | Shell | `ujust runners shell [--instance=N] [-- CMD...]` | Open shell in container |
+| Setup shared storage | `ujust runners setup-shared-storage` | Setup shared storage directory |
 | Delete | `ujust runners delete [--instance=N\|all]` | Remove runner(s) and images |
 
 ## Prerequisites

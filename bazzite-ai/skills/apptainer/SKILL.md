@@ -18,15 +18,13 @@ The `apptainer` command manages Apptainer (formerly Singularity) containers for 
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Pull | `ujust apptainer pull [--image=...] [--tag=...]` | Download image to SIF |
-| Run | `ujust apptainer run [--image=...] [-- CMD...]` | Run container |
-| Shell | `ujust apptainer shell [--image=...]` | Interactive shell |
-| Exec | `ujust apptainer exec [--image=...] [-- CMD...]` | Execute command |
-| Build | `ujust apptainer build [--image=...] [--tag=...]` | Build from definition |
-| Inspect | `ujust apptainer inspect [--image=...]` | Show metadata |
-| GPU | `ujust apptainer gpu` | Test GPU support |
-| Cache | `ujust apptainer cache [--tag=clean\|list]` | Manage cache |
-| Help | `ujust apptainer help` | Show help |
+| Build | `ujust apptainer build DEF` | Build SIF from definition file |
+| Cache | `ujust apptainer cache [clean\|status]` | Manage Apptainer cache |
+| Exec | `ujust apptainer exec IMAGE CMD` | Execute specific command in container |
+| Inspect | `ujust apptainer inspect IMAGE` | Show SIF file metadata |
+| Pull | `ujust apptainer pull IMAGE` | Download container image to SIF file |
+| Run | `ujust apptainer run IMAGE` | Run container with default command |
+| Shell | `ujust apptainer shell [-- CMD]` | Open interactive shell in container |
 
 ## Parameters
 

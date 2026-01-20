@@ -19,18 +19,20 @@ The `vm` command manages bazzite-ai virtual machines using libvirt. VMs are crea
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Add VM | `ujust vm add [NAME] [--cpus=...] [--ram=...]` | Download + create VM |
-| Update VM | `ujust vm update [NAME] [--what=...]` | Update VM config |
-| Delete VM | `ujust vm delete [NAME]` | Remove VM |
-| Download | `ujust vm download [--branch=...]` | Download QCOW2 image |
-| Seed | `ujust vm seed [NAME] [--username=...]` | Create cloud-init ISO |
-| Create | `ujust vm create [NAME] [--cpus=...] [--ram=...]` | Create VM from image |
+| Add | `ujust vm add [NAME]` | Add new VM with default image |
+| Create | `ujust vm create [NAME]` | Create VM from existing disk |
+| Delete | `ujust vm delete [NAME]` | Delete VM and optionally its disk |
+| Download | `ujust vm download [BRANCH]` | Download QCOW2 image |
+| Exec | `ujust vm exec [NAME] CMD` | Execute command via guest-agent |
+| Recreate | `ujust vm recreate [NAME]` | Recreate VM config preserving disk |
+| Seed | `ujust vm seed [NAME]` | Regenerate cloud-init seed ISO |
+| Serial | `ujust vm serial [NAME]` | Serial console connection |
+| SSH | `ujust vm ssh [NAME]` | SSH connection to VM |
 | Start | `ujust vm start [NAME]` | Start VM |
-| Stop | `ujust vm stop [NAME]` | Stop VM |
-| SSH | `ujust vm ssh [NAME] [--ssh-user=...]` | SSH to VM |
-| VNC | `ujust vm vnc [NAME]` | Open VNC viewer |
 | Status | `ujust vm status [NAME]` | Show VM status |
-| Help | `ujust vm help` | Show help |
+| Stop | `ujust vm stop [NAME]` | Stop VM |
+| Update | `ujust vm update [NAME] WHAT` | Update QCOW2 or seed |
+| VNC | `ujust vm vnc [NAME]` | VNC graphical connection |
 
 ## Parameters
 

@@ -24,7 +24,6 @@ The `jupyter` command manages JupyterLab instances for ML/AI development using P
 | Stop | `ujust jupyter stop [--instance=N\|all]` | Stop instance(s) |
 | Restart | `ujust jupyter restart [--instance=N\|all]` | Restart instance(s) |
 | Logs | `ujust jupyter logs [--instance=N] [--lines=...]` | View logs |
-| List | `ujust jupyter list` | List all instances |
 | Status | `ujust jupyter status [--instance=N]` | Show instance status |
 | URL | `ujust jupyter url [--instance=N]` | Show access URL |
 | Shell | `ujust jupyter shell [--instance=N] [-- CMD...]` | Open shell in container |

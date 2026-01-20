@@ -23,16 +23,15 @@ The `localai` command manages the LocalAI service using Podman Quadlet container
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust localai config [--port=...] [--bind=...]` | Configure instance |
-| Start | `ujust localai start [--instance=...]` | Start service |
-| Stop | `ujust localai stop [--instance=...]` | Stop service |
-| Restart | `ujust localai restart [--instance=...]` | Restart service |
-| Logs | `ujust localai logs [--lines=...]` | View logs |
-| Status | `ujust localai status [--instance=...]` | Show status |
-| URL | `ujust localai url [--instance=...]` | Show API URL |
-| List | `ujust localai list` | List instances |
-| Shell | `ujust localai shell [-- CMD...]` | Container shell |
-| Delete | `ujust localai delete [--instance=...]` | Remove service |
+| Config | `ujust localai config` | Configure LocalAI |
+| Delete | `ujust localai delete` | Remove instance config and container |
+| Logs | `ujust localai logs [--lines=N]` | View container logs |
+| Restart | `ujust localai restart` | Restart server |
+| Shell | `ujust localai shell [-- CMD]` | Open shell or execute command in container |
+| Start | `ujust localai start` | Start LocalAI server |
+| Status | `ujust localai status` | Show instance status |
+| Stop | `ujust localai stop` | Stop LocalAI server |
+| URL | `ujust localai url` | Show OpenAI-compatible API URL |
 
 ## Parameters
 

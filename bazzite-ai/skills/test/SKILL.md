@@ -18,12 +18,24 @@ The `test` command provides comprehensive runtime verification for bazzite-ai in
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Quick test | `ujust test quick` | GPU + service status (~30s) |
-| GPU test | `ujust test gpu` | GPU detection and CDI check |
-| CUDA test | `ujust test cuda` | CUDA tests in nvidia container |
-| PyTorch test | `ujust test pytorch` | PyTorch GPU access test |
-| All tests | `ujust test all` | Full test suite (~2min) |
-| Help | `ujust test help` | Show all options |
+| All | `ujust test all` | Run all tests |
+| Apptainer | `ujust test apptainer` | Apptainer GPU detection |
+| Apptainer GPU | `ujust test apptainer gpu` | Apptainer GPU detection |
+| Bootc | `ujust test bootc` | Bootc ephemeral VM test |
+| ComfyUI | `ujust test comfyui` | ComfyUI test |
+| Config | `ujust test config` | Configuration test |
+| CUDA | `ujust test cuda` | CUDA test |
+| GPU | `ujust test gpu` | GPU availability test |
+| Help | `ujust test help` | Show test help |
+| Jupyter | `ujust test jupyter` | JupyterLab test |
+| Network | `ujust test network` | Network test |
+| Ollama | `ujust test ollama` | Ollama inference test |
+| Open WebUI | `ujust test openwebui` | Open WebUI test |
+| Pods | `ujust test pods` | Pod container tests |
+| PyTorch | `ujust test pytorch` | PyTorch test |
+| Quick | `ujust test quick` | Quick runtime tests |
+| Services | `ujust test services` | All services test |
+| Status | `ujust test status` | Test status summary |
 
 ## Parameters
 

@@ -19,11 +19,9 @@ The `tailscale` command manages Tailscale Serve to expose local bazzite-ai servi
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Serve | `ujust tailscale serve [--service=...] [--port=...]` | Expose service to tailnet |
-| Unserve | `ujust tailscale unserve [--service=...\|all]` | Stop exposing service |
+| List | `ujust tailscale list` | List available bazzite-ai services |
+| Serve | `ujust tailscale serve SERVICE [--port=N]` | Expose service to tailnet via HTTPS |
 | Status | `ujust tailscale status` | Show current serve configuration |
-| List | `ujust tailscale list` | List available services |
-| Help | `ujust tailscale help` | Show help |
 
 ## Prerequisites
 

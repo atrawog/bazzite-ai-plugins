@@ -18,16 +18,15 @@ The `openwebui` command manages the Open WebUI service using Podman Quadlet cont
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust openwebui config [--port=...] [--bind=...]` | Configure instance |
-| Start | `ujust openwebui start [--instance=...]` | Start service |
-| Stop | `ujust openwebui stop [--instance=...]` | Stop service |
-| Restart | `ujust openwebui restart [--instance=...]` | Restart service |
-| Logs | `ujust openwebui logs [--lines=...]` | View logs |
-| Status | `ujust openwebui status [--instance=...]` | Show status |
-| URL | `ujust openwebui url [--instance=...]` | Show access URL |
-| List | `ujust openwebui list` | List instances |
-| Shell | `ujust openwebui shell [-- CMD...]` | Container shell |
-| Delete | `ujust openwebui delete [--instance=...]` | Remove service |
+| Config | `ujust openwebui config` | Configure Open WebUI |
+| Delete | `ujust openwebui delete` | Remove instance config and container |
+| Logs | `ujust openwebui logs [--lines=N]` | View container logs |
+| Restart | `ujust openwebui restart` | Restart server |
+| Shell | `ujust openwebui shell [-- CMD]` | Open shell or execute command in container |
+| Start | `ujust openwebui start` | Start Open WebUI server |
+| Status | `ujust openwebui status` | Show instance status |
+| Stop | `ujust openwebui stop` | Stop Open WebUI server |
+| URL | `ujust openwebui url` | Show web UI access URL |
 
 ## Parameters
 

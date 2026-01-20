@@ -19,17 +19,16 @@ The `bootc` command manages bootable container VMs using bcvk (bootc virtualizat
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Test | `ujust test bootc [--image=...] [--cpus=...]` | Ephemeral VM (deleted on exit) |
-| Add | `ujust bootc add [NAME] [--image=...] [--cpus=...]` | Create persistent VM |
-| List | `ujust bootc list` | List all VMs |
-| Status | `ujust bootc status [NAME]` | Show VM status |
-| SSH | `ujust bootc ssh [NAME] [--ssh-user=...]` | Connect to VM |
-| Start | `ujust bootc start [NAME]` | Start VM |
-| Stop | `ujust bootc stop [NAME]` | Stop VM |
-| Delete | `ujust bootc delete [NAME]` | Remove VM |
-| Export | `ujust bootc export [--image=...] [--format=...]` | Export to disk image |
-| Images | `ujust bootc images` | List available images |
-| Help | `ujust bootc help` | Show help |
+| Add | `ujust bootc add [NAME]` | Create persistent VM with disk |
+| Delete | `ujust bootc delete [NAME]` | Delete VM and its disk |
+| Export | `ujust bootc export [IMAGE] [FORMAT]` | Export container as qcow2/raw image |
+| Images | `ujust bootc images` | List available bootc images |
+| List | `ujust bootc list` | List all bootc VMs |
+| Prereqs | `ujust bootc prereqs` | Verify bcvk and dependencies installed |
+| SSH | `ujust bootc ssh [NAME]` | SSH connection to VM |
+| Start | `ujust bootc start [NAME]` | Start persistent VM |
+| Status | `ujust bootc status [NAME]` | Show VM status and info |
+| Stop | `ujust bootc stop [NAME]` | Stop running VM |
 
 ## Prerequisites
 

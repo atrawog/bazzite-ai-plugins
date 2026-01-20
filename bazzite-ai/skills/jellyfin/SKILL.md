@@ -18,16 +18,15 @@ The `jellyfin` command manages Jellyfin media server instances using Podman Quad
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Config | `ujust jellyfin config --config-dir=<CONFIG> --cache-dir=<CACHE> --media-dir=<MEDIA>` | Configure instance |
-| Start | `ujust jellyfin start [--instance=N\|all]` | Start instance(s) |
-| Stop | `ujust jellyfin stop [--instance=N\|all]` | Stop instance(s) |
-| Restart | `ujust jellyfin restart [--instance=N\|all]` | Restart instance(s) |
-| Logs | `ujust jellyfin logs [--instance=N] [--lines=...]` | View logs |
-| List | `ujust jellyfin list` | List all instances |
-| Status | `ujust jellyfin status [--instance=N]` | Show instance status |
-| URL | `ujust jellyfin url [--instance=N]` | Show access URL |
-| Shell | `ujust jellyfin shell [--instance=N] [-- CMD...]` | Open shell in container |
-| Delete | `ujust jellyfin delete [--instance=N\|all]` | Remove instance(s) and images |
+| Config | `ujust jellyfin config` | Configure Jellyfin |
+| Delete | `ujust jellyfin delete` | Remove instance config and container |
+| Logs | `ujust jellyfin logs [--lines=N]` | View container logs |
+| Restart | `ujust jellyfin restart` | Restart server |
+| Shell | `ujust jellyfin shell [-- CMD]` | Open shell or execute command in container |
+| Start | `ujust jellyfin start` | Start Jellyfin media server |
+| Status | `ujust jellyfin status` | Show instance status |
+| Stop | `ujust jellyfin stop` | Stop Jellyfin media server |
+| URL | `ujust jellyfin url` | Show web UI access URL |
 
 ## Configuration
 

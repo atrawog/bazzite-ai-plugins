@@ -16,49 +16,31 @@ The `install` command is a unified dispatcher for installing standalone developm
 
 ## Quick Reference
 
-### Development Tools
-
-| Program | Command | Description |
-|---------|---------|-------------|
-| Claude Code | `ujust install claude-code-npm` | Claude Code AI CLI (npm) |
-| Pixi | `ujust install pixi` | Conda-compatible package manager |
-| Chunkhound | `ujust install chunkhound` | Semantic code search MCP |
+| Target | Command | Description |
+|--------|---------|-------------|
+| Aider | `ujust install aider` | AI pair programming tool |
+| AppImage Manager | `ujust install appimage-manager` | AppImage management tool |
+| bcvk | `ujust install bcvk` | Bootc virtualization kit |
+| ccstatusline | `ujust install ccstatusline` | Claude Code statusline plugin |
+| Chrome DevTools MCP | `ujust install chrome-devtools-mcp` | Chrome DevTools MCP server |
+| Chrome Extension Fix | `ujust install chrome-extension-fix` | Fix Chrome extension permissions |
+| Chunkhound | `ujust install chunkhound` | Semantic code search MCP server |
+| Claude Code | `ujust install claude-code-npm` | Claude Code AI assistant CLI |
+| Dev Tools | `ujust install dev-tools` | Meta-installer for dev tools |
 | Devcontainers CLI | `ujust install devcontainers-cli` | Dev Container CLI |
-| TweakCC | `ujust install tweakcc` | Claude Code customization |
-| ccstatusline | `ujust install ccstatusline` | Claude Code statusline widget |
-| Chrome Extension Fix | `ujust install chrome-extension-fix` | Fix Claude extension |
-| GitHub MCP | `ujust install github-mcp-server` | GitHub MCP server |
-| Chrome DevTools MCP | `ujust install chrome-devtools-mcp` | Chrome DevTools MCP |
-| Kind | `ujust install kind [VERSION]` | Kubernetes in Docker |
-| Minikube | `ujust install minikube [VERSION]` | Local Kubernetes |
-| bcvk | `ujust install bcvk` | bootc virtualization kit |
-| Linters | `ujust install linters` | Code linting tools |
+| Firebase CLI | `ujust install firebase-cli` | Firebase CLI |
+| Flatpaks Communication | `ujust install flatpaks-communication` | Communication flatpaks |
+| Flatpaks Dev | `ujust install flatpaks-dev` | Development flatpaks |
+| Flatpaks Gaming | `ujust install flatpaks-gaming` | Gaming tools flatpaks |
+| Flatpaks Media | `ujust install flatpaks-media` | Media & graphics flatpaks |
+| Fonts | `ujust install fonts` | Extra fonts via Homebrew |
+| Gemini CLI | `ujust install gemini-cli` | Gemini CLI (Google AI) |
+| GitHub MCP | `ujust install github-mcp-server` | GitHub MCP server for Claude |
 | Homebrew | `ujust install homebrew` | Homebrew package manager |
-| AppImage Manager | `ujust install appimage-manager` | Gear Lever AppImage manager |
-| Gemini CLI | `ujust install gemini-cli` | Google Gemini CLI |
-| Firebase CLI | `ujust install firebase-cli` | Firebase project management |
+| Linters | `ujust install linters` | Code linting tools |
+| Pixi | `ujust install pixi` | Conda-compatible package manager |
+| TweakCC | `ujust install tweakcc` | Claude Code customization tool |
 | Wrangler | `ujust install wrangler` | Cloudflare Workers CLI |
-
-### Meta-Installers
-
-| Program | Command | Description |
-|---------|---------|-------------|
-| Dev Tools | `ujust install dev-tools [COMPONENT]` | Install tool groups |
-| Kubernetes | `ujust install kubernetes-tools` | Kind + Minikube |
-
-### Flatpak Categories
-
-| Category | Command | Description |
-|----------|---------|-------------|
-| Dev | `ujust install flatpaks-dev` | Development flatpaks |
-| Media | `ujust install flatpaks-media` | Media & graphics |
-| Gaming | `ujust install flatpaks-gaming` | Gaming tools |
-| Communication | `ujust install flatpaks-communication` | Chat apps |
-| Productivity | `ujust install flatpaks-productivity` | Office tools |
-| Utilities | `ujust install flatpaks-utilities` | Utility apps |
-| Experimental | `ujust install flatpaks-experimental` | Experimental apps |
-| Streaming | `ujust install flatpaks-streaming` | Streaming clients |
-| All | `ujust install flatpaks-all` | All flatpaks |
 
 ## Common Installations
 
