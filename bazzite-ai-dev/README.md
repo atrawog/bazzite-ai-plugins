@@ -33,7 +33,7 @@ This plugin includes a GitHub MCP server for repository operations.
 |-------|---------|-------------|
 | build | `/bazzite-ai-dev:build` | OS image building with Podman |
 | clean | `/bazzite-ai-dev:clean` | Cleanup build artifacts and caches |
-| test | `/bazzite-ai-dev:test` | Overlay testing session management |
+| test | `/bazzite-ai-dev:test` | Overlay testing - `just overlay refresh` (auto-enables) |
 
 ## Enforcement Agents
 
