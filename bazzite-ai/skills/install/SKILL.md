@@ -72,18 +72,6 @@ ujust install flatpaks-dev
 
 ```
 
-### Kubernetes Development
-
-```bash
-# Install both Kind and Minikube
-ujust install kubernetes-tools
-
-# Or individually
-ujust install kind
-ujust install minikube
-
-```
-
 ### VM Testing
 
 ```bash
@@ -254,8 +242,6 @@ Use when the user asks about:
 - "install claude code", "setup claude", "claude cli"
 
 - "install pixi", "conda alternative"
-
-- "install kubernetes", "setup kind", "minikube"
 
 - "install flatpaks", "flatpak applications"
 
