@@ -1,10 +1,10 @@
 ---
 name: deploy
 description: |
-  Helm-based application deployment to k3d Kubernetes clusters. Currently supports
-  JupyterHub multi-user notebook server. Automatically creates k3d cluster if needed,
-  manages configuration, and provides lifecycle commands. Use when users need to run
-  multi-user Jupyter notebooks or other Helm-based applications in Kubernetes.
+  Helm-based application deployment to k3d Kubernetes clusters. Supports JupyterHub
+  multi-user notebook server and KubeAI GPU-accelerated LLM inference. Automatically
+  creates k3d cluster if needed, manages configuration, and provides lifecycle commands.
+  Use when users need to run multi-user Jupyter notebooks or AI inference workloads.
 ---
 
 # deploy - Kubernetes Application Deployment
@@ -13,9 +13,15 @@ description: |
 
 The `deploy` command manages Helm-based application deployments to k3d Kubernetes clusters. It handles the full lifecycle: configuration, installation, upgrades, and uninstallation.
 
-**Key Concept:** Deploy commands use k3d clusters (lightweight k3s in Podman). If a cluster doesn't exist, it's automatically created. JupyterHub is deployed via the official Helm chart with defaults optimized for local development.
+**Supported Applications:**
+- **JupyterHub** - Multi-user notebook server
+- **KubeAI** - GPU-accelerated LLM inference server (OpenAI-compatible API)
+
+**Key Concept:** Deploy commands use k3d clusters (lightweight k3s in Podman). If a cluster doesn't exist, it's automatically created.
 
 ## Quick Reference
+
+### JupyterHub
 
 | Action | Command | Description |
 |--------|---------|-------------|
@@ -25,6 +31,18 @@ The `deploy` command manages Helm-based application deployments to k3d Kubernete
 | Status | `ujust deploy jupyterhub status [--instance=N]` | Show deployment status |
 | Uninstall | `ujust deploy jupyterhub uninstall [--instance=N]` | Remove deployment (keep config) |
 | Delete | `ujust deploy jupyterhub delete [--instance=N]` | Remove config and deployment |
+
+### KubeAI
+
+| Action | Command | Description |
+|--------|---------|-------------|
+| Config | `ujust deploy kubeai config [--instance=N]` | Configure KubeAI deployment |
+| Install | `ujust deploy kubeai install [--instance=N]` | Deploy KubeAI to k3d cluster |
+| Upgrade | `ujust deploy kubeai upgrade [--instance=N]` | Upgrade Helm release |
+| Status | `ujust deploy kubeai status [--instance=N]` | Show KubeAI deployment status |
+| Model | `ujust deploy kubeai model --model=NAME` | Deploy a model to KubeAI |
+| Uninstall | `ujust deploy kubeai uninstall [--instance=N]` | Remove KubeAI deployment |
+| Delete | `ujust deploy kubeai delete [--instance=N]` | Remove config and deployment |
 
 ## Prerequisites
 

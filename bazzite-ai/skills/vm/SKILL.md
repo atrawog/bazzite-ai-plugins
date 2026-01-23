@@ -20,19 +20,23 @@ The `vm` command manages bazzite-ai virtual machines using libvirt. VMs are crea
 | Action | Command | Description |
 |--------|---------|-------------|
 | Add | `ujust vm add [NAME]` | Add new VM with default image |
+| Boot-log | `ujust vm boot-log [NAME]` | Get boot messages via guest agent |
 | Create | `ujust vm create [NAME]` | Create VM from existing disk |
 | Delete | `ujust vm delete [NAME]` | Delete VM and optionally its disk |
+| Diag | `ujust vm diag [NAME]` | Full diagnostic (no SSH required) |
 | Download | `ujust vm download [BRANCH]` | Download QCOW2 image |
 | Exec | `ujust vm exec [NAME] CMD` | Execute command via guest-agent |
 | Recreate | `ujust vm recreate [NAME]` | Recreate VM config preserving disk |
 | Seed | `ujust vm seed [NAME]` | Regenerate cloud-init seed ISO |
 | Serial | `ujust vm serial [NAME]` | Serial console connection |
+| Shell-exec | `ujust vm shell-exec [NAME] CMD` | Execute shell command via guest agent |
 | SSH | `ujust vm ssh [NAME]` | SSH connection to VM |
 | Start | `ujust vm start [NAME]` | Start VM |
 | Status | `ujust vm status [NAME]` | Show VM status |
 | Stop | `ujust vm stop [NAME]` | Stop VM |
 | Update | `ujust vm update [NAME] WHAT` | Update QCOW2 or seed |
 | VNC | `ujust vm vnc [NAME]` | VNC graphical connection |
+| Wait-agent | `ujust vm wait-agent [NAME]` | Wait for guest agent to be ready |
 
 ## Parameters
 

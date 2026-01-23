@@ -19,26 +19,20 @@ The `install` command is a unified dispatcher for installing standalone developm
 | Target | Command | Description |
 |--------|---------|-------------|
 | Aider | `ujust install aider` | AI pair programming tool |
-| AppImage Manager | `ujust install appimage-manager` | AppImage management tool |
+| All | `ujust install all` | Install everything (dev tools + flatpaks) |
 | bcvk | `ujust install bcvk` | Bootc virtualization kit |
 | ccstatusline | `ujust install ccstatusline` | Claude Code statusline plugin |
 | Chrome DevTools MCP | `ujust install chrome-devtools-mcp` | Chrome DevTools MCP server |
 | Chrome Extension Fix | `ujust install chrome-extension-fix` | Fix Chrome extension permissions |
-| Chunkhound | `ujust install chunkhound` | Semantic code search MCP server |
-| Claude Code | `ujust install claude-code-npm` | Claude Code AI assistant CLI |
-| Dev Tools | `ujust install dev-tools` | Meta-installer for dev tools |
-| Devcontainers CLI | `ujust install devcontainers-cli` | Dev Container CLI |
-| Firebase CLI | `ujust install firebase-cli` | Firebase CLI |
+| Claude Code | `ujust install claude-code` | Claude Code AI assistant CLI |
+| Devcontainers | `ujust install devcontainers` | Dev Container CLI |
+| Devtools | `ujust install devtools` | Meta-installer for dev tools |
+| Firebase | `ujust install firebase` | Firebase CLI |
 | Flatpaks Communication | `ujust install flatpaks-communication` | Communication flatpaks |
 | Flatpaks Dev | `ujust install flatpaks-dev` | Development flatpaks |
-| Flatpaks Gaming | `ujust install flatpaks-gaming` | Gaming tools flatpaks |
 | Flatpaks Media | `ujust install flatpaks-media` | Media & graphics flatpaks |
-| Fonts | `ujust install fonts` | Extra fonts via Homebrew |
-| Gemini CLI | `ujust install gemini-cli` | Gemini CLI (Google AI) |
+| Gemini | `ujust install gemini` | Gemini CLI (Google AI) |
 | GitHub MCP | `ujust install github-mcp-server` | GitHub MCP server for Claude |
-| Homebrew | `ujust install homebrew` | Homebrew package manager |
-| Linters | `ujust install linters` | Code linting tools |
-| Pixi | `ujust install pixi` | Conda-compatible package manager |
 | TweakCC | `ujust install tweakcc` | Claude Code customization tool |
 | Wrangler | `ujust install wrangler` | Cloudflare Workers CLI |
 
@@ -48,10 +42,7 @@ The `install` command is a unified dispatcher for installing standalone developm
 
 ```bash
 # Install Claude Code
-ujust install claude-code-npm
-
-# Install Chunkhound for code search
-ujust install chunkhound
+ujust install claude-code
 
 # Install GitHub MCP server
 ujust install github-mcp-server
@@ -59,17 +50,21 @@ ujust install github-mcp-server
 # Install Chrome DevTools MCP (for browser automation)
 ujust install chrome-devtools-mcp
 
+# Install all dev tools at once
+ujust install devtools
 ```
 
-### Python/ML Development
+### Flatpak Applications
 
 ```bash
-# Install Pixi (Conda-compatible, faster)
-ujust install pixi
-
 # Install development flatpaks
 ujust install flatpaks-dev
 
+# Install media & graphics flatpaks
+ujust install flatpaks-media
+
+# Install communication flatpaks
+ujust install flatpaks-communication
 ```
 
 ### VM Testing

@@ -1,278 +1,345 @@
 ---
 name: test
 description: |
-  Overlay testing session management for bazzite-ai development. Enables live
-  editing of justfiles via symlinks to /usr on immutable OS (OSTree) or traditional
-  Linux systems. Use when users need to test ujust changes, enable overlay mode,
-  troubleshoot testing sessions, or run VM/install tests.
+  Runtime verification tests for bazzite-ai installations. Validates GPU access,
+  CUDA/PyTorch, service health, pod lifecycles, k3d clusters, and network connectivity.
+  Run with 'ujust test' on installed systems. Use when developers need to verify
+  their bazzite-ai installation is working correctly.
 ---
 
-# Test - Overlay Testing Management
+# Test - Runtime Verification
 
 ## Overview
 
-The overlay testing system enables live editing of justfiles by creating symlinks from the repository to `/usr/share/bazzite-ai/just/`. This allows testing changes without rebuilding the OS image.
+The `test` command provides runtime verification tests for bazzite-ai installations. It validates that GPU access, services, containers, and network connectivity are working correctly.
 
-**Key Concept:** On immutable OSTree systems (Bazzite-AI, Silverblue), `/usr` is read-only. Overlay mode temporarily unlocks it. On traditional systems (Fedora, CentOS), symlinks provide the same live-editing capability.
-
-**Command Contexts:**
-- `just overlay` - Development mode (from repository root)
-- `ujust test` - Runtime verification (on installed bazzite-ai system)
-
-**Important:** Overlay commands (`just overlay`) are development-only and run from the repository root. Runtime verification commands (`ujust test quick`, `ujust test gpu`, etc.) run on installed systems.
+**Key Concept:** These are runtime tests that run on an installed bazzite-ai system using `ujust test`. For development overlay management, see the `/bazzite-ai-dev:overlay` skill.
 
 ## Quick Reference
 
-### Development Mode (from repo root)
+### Quick Tests
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Refresh overlay | `just overlay refresh` | Auto-enables if needed, then refreshes |
-| Check status | `just overlay check` | Show current overlay/symlink status |
-| Enable overlay | `just overlay enable` | Manually bootstrap overlay session |
-| System info | `just overlay info` | Show detailed system info |
-| Help | `just overlay help` | Show usage help |
+| Quick | `ujust test quick` | GPU + service status (~30s) |
+| All | `ujust test all` | Full test suite (~2min) |
+| Info | `ujust test info` | Show system information |
 
-**Note:** `just overlay refresh` automatically enables the overlay if not active - this is the recommended primary command.
-
-### Runtime Verification (on installed system)
+### Individual Tests
 
 | Action | Command | Description |
 |--------|---------|-------------|
-| Quick test | `ujust test quick` | Fast GPU + services check (~30s) |
-| Full test | `ujust test all` | Complete test suite (~2min) |
-| GPU test | `ujust test gpu` | GPU detection and CDI check |
-| Help | `ujust test help` | Show all runtime test options |
+| GPU | `ujust test gpu` | GPU detection and CDI check |
+| CUDA | `ujust test cuda` | CUDA tests in nvidia container |
+| PyTorch | `ujust test pytorch` | PyTorch tests in jupyter container |
+| Ollama | `ujust test ollama` | Ollama health + quick inference |
+| Jupyter | `ujust test jupyter` | Jupyter service health |
+| ComfyUI | `ujust test comfyui` | ComfyUI service health |
+| OpenWebUI | `ujust test openwebui` | Open WebUI service health |
+| Services | `ujust test services` | All installed services status |
+| Config | `ujust test config` | Config validation |
+| Network | `ujust test network` | Registry connectivity |
+
+### Pod Testing (default INSTANCE=90)
+
+| Action | Command | Description |
+|--------|---------|-------------|
+| Config | `ujust test pods config` | Configure all test pods |
+| Start | `ujust test pods start` | Start all test pods |
+| Status | `ujust test pods status` | Check test pod status |
+| Stop | `ujust test pods stop` | Stop all test pods |
+| Delete | `ujust test pods delete` | Delete test pod configs |
+| All | `ujust test pods all` | Full lifecycle test |
+
+### K3d Cluster Testing (default INSTANCE=90)
+
+| Action | Command | Description |
+|--------|---------|-------------|
+| Config | `ujust test k3d config` | Create k3d cluster |
+| Start | `ujust test k3d start` | Start k3d cluster |
+| Status | `ujust test k3d status` | Check cluster health |
+| GPU | `ujust test k3d gpu` | Setup NVIDIA GPU support |
+| Network | `ujust test k3d network` | Test K8s → bazzite-ai network |
+| Ollama | `ujust test k3d ollama` | Test ollama from k8s |
+| Stop | `ujust test k3d stop` | Stop k3d cluster |
+| Delete | `ujust test k3d delete` | Delete k3d cluster |
+| All | `ujust test k3d all` | Full k3d lifecycle |
+
+### Portainer + K3d Testing (default INSTANCE=91)
+
+| Action | Command | Description |
+|--------|---------|-------------|
+| Config | `ujust test portainer config` | Configure k3d + Portainer |
+| Start | `ujust test portainer start` | Start both services |
+| Status | `ujust test portainer status` | Check both services |
+| Health | `ujust test portainer health` | Test Portainer HTTPS API |
+| K3d | `ujust test portainer k3d` | Test Portainer sees k3d |
+| Stop | `ujust test portainer stop` | Stop both services |
+| Delete | `ujust test portainer delete` | Delete both configs |
+| All | `ujust test portainer all` | Full Portainer + k3d lifecycle |
+
+### VM & Install Testing
+
+| Action | Command | Description |
+|--------|---------|-------------|
+| VM | `ujust test vm` | VM testing menu |
+| VM Add | `ujust test vm add` | Add test VM |
+| VM Start | `ujust test vm start` | Start test VM |
+| Install | `ujust test install` | Install command testing |
+| Install All | `ujust test install all` | Test all install commands |
 
 ## Parameters
 
-### Development Mode (just overlay)
-
 ```bash
-just overlay ACTION
+ujust test ACTION [SUBACTION] [OPTIONS...]
 ```
 
 | Parameter | Values | Description |
 |-----------|--------|-------------|
-| `ACTION` | `refresh`, `check`, `enable`, `info`, `help` | Overlay action |
+| `ACTION` | See quick reference | Test category |
+| `SUBACTION` | Varies by action | Specific test within category |
+| `INSTANCE` | Number | Instance number for isolated testing (default: 90) |
 
-### Runtime Mode (ujust test)
+## Quick Tests
 
-```bash
-ujust test ACTION SUBACTION OPTIONS...
-```
-
-| Parameter | Values | Description |
-|-----------|--------|-------------|
-| `ACTION` | `quick`, `all`, `gpu`, `cuda`, `services`, `pods`, etc. | Test action |
-| `SUBACTION` | varies by action | Subaction |
-| `OPTIONS` | `--instance`, `-n`, etc. | Additional options |
-
-### Rule of Intent
-
-When `ACTION` is provided, the command runs non-interactively. Without it, an interactive menu appears.
-
-## Overlay Commands (Development Mode)
-
-### Refresh Overlay (Recommended)
+### Quick Test (~30s)
 
 ```bash
-just overlay refresh
+ujust test quick
 ```
 
-**Auto-enables if needed**, then regenerates imports. Use this as your primary command.
+Runs essential checks:
 
-1. Checks if overlay/symlinks are active
-2. If NOT active → automatically runs enable first
-3. Regenerates `60-custom.just` import file
-4. Shows success message
+1. GPU detection
+2. CDI configuration
+3. Running services status
 
-### Check Status
+**Use when:** Quick sanity check after installation or reboot.
+
+### Full Test Suite (~2min)
 
 ```bash
-just overlay check
+ujust test all
 ```
 
-Shows current status:
+Runs comprehensive tests:
 
-- **Immutable OS**: Whether overlay mode is active
-- **Traditional OS**: Whether symlinks are configured
-- Target repository path
+1. GPU and CUDA validation
+2. PyTorch in container
+3. All service health checks
+4. Network connectivity
 
-### Enable Overlay (Manual)
+**Use when:** Full validation after major changes.
+
+## GPU Testing
+
+### GPU Detection
 
 ```bash
-just overlay enable
+ujust test gpu
 ```
 
-Manually bootstraps overlay session:
+Checks:
 
-1. Activates overlay mode (OSTree) or creates symlinks (traditional)
-2. Detects repository location automatically
-3. Sets up symlinks to `/usr/share/bazzite-ai/just/`
-4. Generates `60-custom.just` import file
-5. Requires sudo (handles internally)
+- GPU vendor detection (NVIDIA, AMD, Intel)
+- Driver loaded
+- CDI configuration present
 
-**Note:** You rarely need this directly - `just overlay refresh` auto-enables.
-
-## VM Testing
+### CUDA Test
 
 ```bash
-ujust test vm              # Interactive VM test menu
-ujust test vm list         # List available VM tests
-ujust test vm <name>       # Run specific VM test
-
+ujust test cuda
 ```
 
-Delegates to the VM testing harness for testing in virtual machines.
+Runs CUDA tests inside nvidia container:
 
-## Install Testing
+- nvidia-smi output
+- CUDA version
+- GPU memory info
+
+### PyTorch Test
 
 ```bash
-ujust test install         # Interactive install test menu
-ujust test install all     # Test all install commands
-ujust test install <name>  # Test specific install command
-
+ujust test pytorch
 ```
 
-Tests install commands for validation.
+Runs PyTorch GPU tests inside jupyter container:
+
+- torch.cuda.is_available()
+- GPU tensor operations
+- Memory allocation
+
+## Pod Lifecycle Testing
+
+Test pods use isolated instances (default: 90) to avoid interfering with user configurations.
+
+### Full Pod Lifecycle
+
+```bash
+ujust test pods all
+```
+
+Runs complete lifecycle:
+
+1. **config** - Configure test pods
+2. **start** - Start all pods
+3. **status** - Verify running
+4. **stop** - Stop all pods
+5. **delete** - Clean up configs
+
+### Custom Instance
+
+```bash
+# Use different instance number
+ujust test pods all INSTANCE=50
+```
+
+## K3d Cluster Testing
+
+Tests k3d Kubernetes cluster functionality.
+
+### Full K3d Lifecycle
+
+```bash
+ujust test k3d all
+```
+
+Tests:
+
+1. Cluster creation on bazzite-ai network
+2. Node health
+3. GPU support (if NVIDIA)
+4. Network connectivity to other pods
+5. Ollama inference from k8s
+6. Cleanup
+
+### Network Connectivity
+
+```bash
+ujust test k3d network
+```
+
+Verifies k8s pods can reach bazzite-ai network services (ollama, jupyter, etc.)
 
 ## Common Workflows
 
-### Initial Development Setup
+### After Installation
 
 ```bash
-# 1. Clone repository
-git clone <repo-url> && cd bazzite-ai
+# Quick sanity check
+ujust test quick
 
-# 2. Start overlay testing (auto-enables if needed)
-just overlay refresh
-
-# 3. Make changes to justfiles
-vim just/bazzite-ai/my-feature.just
-
-# 4. Test immediately with ujust
-ujust my-feature
-
-# 5. If adding new files, refresh again
-just overlay refresh
+# If issues, run full suite
+ujust test all
 ```
 
-### After Reboot (Immutable OS Only)
+### GPU Troubleshooting
 
 ```bash
-# Overlay resets on reboot - just run refresh
-just overlay refresh
+# Check GPU detection
+ujust test gpu
 
-# It auto-enables, then refreshes
-# Your git commits persist, overlay changes don't
+# Test CUDA
+ujust test cuda
+
+# Test PyTorch
+ujust test pytorch
 ```
 
-### Testing a New Command
+### Service Validation
 
 ```bash
-# 1. Create/edit the justfile
-vim just/bazzite-ai/new-command.just
+# Check all services
+ujust test services
 
-# 2. Refresh to pick up new file
-just overlay refresh
-
-# 3. Test the command
-ujust new-command
+# Individual service
+ujust test ollama
+ujust test jupyter
 ```
 
-## OS Type Detection
+### Before Development
 
-| OS Type | Detection | Overlay Method |
-|---------|-----------|----------------|
-| Immutable (OSTree) | `/run/ostree-booted` exists | `rpm-ostree` overlay |
-| Traditional | No OSTree marker | Symlinks only |
+```bash
+# Full validation
+ujust test all
+
+# Enable overlay mode for development
+just overlay refresh
+```
 
 ## Troubleshooting
 
-### Overlay Not Active After Enable
+### GPU Test Fails
 
-**Symptom:** `just overlay check` shows "Normal immutable mode"
+**Symptom:** `ujust test gpu` reports no GPU
 
-**Cause:** Overlay activation failed
-
-**Fix:**
+**Check:**
 
 ```bash
-# Check if rpm-ostree unlock succeeded
-sudo rpm-ostree status | grep -i unlock
+# Host GPU
+nvidia-smi  # or lspci | grep -i vga
 
-# If not, try manual unlock
-sudo rpm-ostree usroverlay
-
-# Then refresh
-just overlay refresh
+# CDI configuration
+ls /etc/cdi/
 ```
 
-### Symlinks Not Working
-
-**Symptom:** Changes to justfiles not reflected in `ujust` output
-
-**Cause:** Symlinks not properly created or 60-custom.just not regenerated
-
 **Fix:**
 
 ```bash
-# Check symlink status
-ls -la /usr/share/bazzite-ai/just/
-
-# Refresh (auto-enables if needed)
-just overlay refresh
+# Regenerate CDI
+ujust config gpu setup
 ```
 
-### Command Not Found After Adding File
+### CUDA Test Fails
 
-**Symptom:** New recipe not available in `ujust --list`
+**Symptom:** CUDA not available in container
 
-**Cause:** 60-custom.just needs regeneration
+**Cause:** CDI not configured or driver mismatch
 
 **Fix:**
 
 ```bash
-just overlay refresh
+# Rebuild CDI spec
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
 ```
 
-### Permission Denied
+### Service Test Fails
 
-**Symptom:** `sudo: a terminal is required`
+**Symptom:** Service reports unhealthy
 
-**Cause:** Running in non-interactive mode without passwordless sudo
+**Check:**
+
+```bash
+# Service status
+systemctl --user status <service>
+
+# Logs
+journalctl --user -u <service> -n 50
+```
+
+### Pod Test Cleanup Failed
+
+**Symptom:** Test pods still exist after failure
 
 **Fix:**
 
 ```bash
-# Enable passwordless sudo first
-ujust config passwordless-sudo enable
-
-# Then retry
-just overlay refresh
+# Manual cleanup
+ujust test pods delete INSTANCE=90
 ```
 
 ## Cross-References
 
-- **Related Skills:** `install` (for testing install commands), `vm` (for VM testing)
-
-- **Configuration:** `ujust config passwordless-sudo enable` for sudo access
-
-- **Documentation:** [Overlay Testing Architecture](./references/overlay-architecture.md)
+- **Overlay Development:** `/bazzite-ai-dev:overlay` skill for development mode
+- **GPU Setup:** `ujust config gpu setup` for GPU configuration
+- **Services:** Individual service skills for detailed management
 
 ## When to Use This Skill
 
 Use when the user asks about:
 
-- "enable overlay", "start testing session", "development mode"
-
-- "test my changes", "live reload justfiles"
-
-- "overlay not working", "symlinks not configured"
-
-- "refresh overlay", "pick up new files"
-
-- "VM testing", "test in VM"
-
-- "test install commands"
+- "test installation", "verify bazzite-ai"
+- "test gpu", "test cuda", "test pytorch"
+- "test services", "service health"
+- "ujust test" (any test command)
+- "test pods", "test k3d", "lifecycle test"

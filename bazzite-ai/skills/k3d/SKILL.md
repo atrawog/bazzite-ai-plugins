@@ -27,6 +27,7 @@ The `k3d` command manages lightweight Kubernetes (k3s) clusters running in Podma
 | Status | `ujust k3d status [--instance=N]` | Show cluster status and nodes |
 | Shell | `ujust k3d shell [--instance=N] [-- CMD]` | Execute kubectl commands |
 | GPU | `ujust k3d gpu [--instance=N]` | Setup GPU support (NVIDIA device plugin) |
+| Kubeconfig | `ujust k3d kubeconfig [--instance=N]` | Show kubeconfig path |
 | List | `ujust k3d list` | List all k3d clusters |
 | Delete | `ujust k3d delete [--instance=N]` | Remove k3d cluster and cleanup |
 

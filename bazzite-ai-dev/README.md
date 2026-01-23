@@ -27,13 +27,16 @@ This plugin includes a GitHub MCP server for repository operations.
 - `github-mcp-server` available via direnv (installed in project)
 - `GITHUB_TOKEN` environment variable set
 
-## Available Skills
+## Available Skills (6)
 
 | Skill | Command | Description |
 |-------|---------|-------------|
-| build | `/bazzite-ai-dev:build` | OS image building with Podman |
-| clean | `/bazzite-ai-dev:clean` | Cleanup build artifacts and caches |
-| test | `/bazzite-ai-dev:test` | Overlay testing - `just overlay refresh` (auto-enables) |
+| build | `/bazzite-ai-dev:build` | OS image building with Podman (`just build`) |
+| clean | `/bazzite-ai-dev:clean` | Cleanup build artifacts and caches (`just clean`) |
+| lfs | `/bazzite-ai-dev:lfs` | Git LFS file management (`just lfs`) |
+| overlay | `/bazzite-ai-dev:overlay` | Development overlay session management (`just overlay`) |
+| record | `/bazzite-ai-dev:record` | Batch documentation recording (`just record`) |
+| test | `/bazzite-ai-dev:test` | Runtime verification tests (`ujust test`) |
 
 ## Enforcement Agents
 
@@ -70,13 +73,25 @@ These agents are automatically invoked to enforce development policies:
 /bazzite-ai-dev:build
 # Claude will help with image building, troubleshooting, etc.
 
-# Set up testing environment
+# Enable development overlay mode
+/bazzite-ai-dev:overlay
+# Claude will guide you through overlay setup for live justfile editing
+
+# Run runtime verification tests
 /bazzite-ai-dev:test
-# Claude will guide you through overlay testing setup
+# Claude will help verify GPU, services, and pod functionality
 
 # Clean up after development
 /bazzite-ai-dev:clean
 # Claude will help clean build artifacts and caches
+
+# Manage Git LFS files
+/bazzite-ai-dev:lfs
+# Claude will help with large file checkout and verification
+
+# Generate documentation recordings
+/bazzite-ai-dev:record
+# Claude will help batch-record ujust commands for docs
 ```
 
 ## Installation
@@ -103,9 +118,9 @@ Add to your Claude Code settings:
 
 ## Development Workflow
 
-1. **Enable overlay testing**: `ujust test overlay enable`
+1. **Enable overlay testing**: `just overlay refresh` (auto-enables if needed)
 2. **Make changes** to justfiles in `just/` directory
-3. **Refresh overlay**: `ujust test overlay refresh`
+3. **Refresh overlay**: `just overlay refresh`
 4. **Test with ujust**: `ujust <your-command>`
 5. **Verify LOCAL**: Check systemctl status, journalctl logs
 6. **Run pre-commit**: `pre-commit run --all-files`

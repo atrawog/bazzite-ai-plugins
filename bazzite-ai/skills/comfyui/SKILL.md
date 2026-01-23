@@ -363,7 +363,7 @@ ujust comfyui config --models-dir=/data/models
 ## Cross-References
 
 - **Related Skills:** `ollama` (LLM inference), `jupyter` (notebooks)
-- **Pod Building:** `just build pod comfyui`
+- **Pod Building:** See `/bazzite-ai-dev:build` skill for developers
 - **ComfyUI Docs:** <https://github.com/comfyanonymous/ComfyUI>
 - **ComfyUI-Manager:** <https://github.com/ltdrdata/ComfyUI-Manager>
 - **CivitAI:** <https://civitai.com/>
