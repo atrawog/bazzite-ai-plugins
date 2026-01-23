@@ -1,5 +1,5 @@
 ---
-name: api
+name: chat
 description: |
   Direct REST API operations for Ollama using the requests library.
   Covers all /api/* endpoints for model management, text generation,
@@ -239,5 +239,5 @@ Use when:
 
 ## Cross-References
 
-- `bazzite-ai-ollama:python` - Higher-level Python library
-- `bazzite-ai-ollama:openai` - OpenAI-compatible interface
+- `bazzite-ai-jupyter:ollama` - Higher-level Python library
+- `bazzite-ai-jupyter:openai` - OpenAI-compatible interface

@@ -1,10 +1,10 @@
 # bazzite-ai-jupyter
 
-ML/AI development workflows for JupyterLab - LangChain, RAG, fine-tuning, and model optimization.
+ML/AI development workflows for JupyterLab - Ollama API, LangChain, RAG, fine-tuning, and model optimization.
 
 ## Overview
 
-This plugin provides skills for **ML/AI workflows** in JupyterLab.
+This plugin provides skills for **ML/AI workflows** in JupyterLab, including Ollama API operations for LLM inference.
 
 ## MCP Server
 
@@ -17,9 +17,21 @@ This plugin includes a Jupyter MCP server that connects to a running JupyterLab 
 
 **Prerequisite:** JupyterLab must be running with MCP support enabled (via `ujust jupyter start`).
 
-**Note:** This plugin is designed to work with the `bazzite-ai-pod-jupyter` container or any JupyterLab environment with the required packages. For Ollama API operations, see `bazzite-ai-ollama`.
+**Note:** This plugin is designed to work with the `bazzite-ai-pod-jupyter` container or any JupyterLab environment with the required packages.
 
 ## Skills
+
+### Ollama API Operations
+
+| Skill | Description |
+|-------|-------------|
+| `chat` | Direct REST API operations using requests library |
+| `ollama` | Official `ollama` Python library usage |
+| `openai` | OpenAI compatibility layer for migration |
+| `gpu` | GPU monitoring, VRAM usage, and inference metrics |
+| `huggingface` | Import GGUF models from HuggingFace |
+
+### ML/AI Development
 
 | Skill | Description |
 |-------|-------------|
@@ -39,13 +51,9 @@ This plugin includes a Jupyter MCP server that connects to a running JupyterLab 
 | `vision` | Vision model fine-tuning with FastVisionModel |
 | `qlora` | Advanced QLoRA experiments (alpha, rank, modules) |
 
-## MCP Server
-
-This plugin bundles a **Jupyter MCP server** that connects to your running JupyterLab instance.
+## MCP Server Tools
 
 **Connection:** `http://127.0.0.1:8888/mcp`
-
-**Available tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -69,19 +77,30 @@ The MCP server starts automatically when this plugin is enabled.
 **Ollama (for inference):**
 
 - Ollama server running (default: `http://ollama:11434` or `OLLAMA_HOST` env var)
-- Model available (pull via API):
-
-```python
-import requests
-OLLAMA_HOST = "http://ollama:11434"
-requests.post(f"{OLLAMA_HOST}/api/pull", json={"name": "hf.co/NousResearch/Nous-Hermes-2-Mistral-7B-DPO-GGUF:Q4_K_M"}, stream=True)
-```
+- Model available (pull via API or Python library)
 
 **Note:** All required Python packages are pre-installed in the `bazzite-ai-pod-jupyter` container.
 
 ## Quick Start
 
-### Critical Import Order
+### Ollama Python Library
+
+```python
+import ollama
+
+# Generate text
+result = ollama.generate(model="llama3.2:latest", prompt="Hello!")
+print(result["response"])
+
+# Chat completion
+response = ollama.chat(
+    model="llama3.2:latest",
+    messages=[{"role": "user", "content": "What is Python?"}]
+)
+print(response["message"]["content"])
+```
+
+### Critical Import Order (for Fine-tuning)
 
 ```python
 # CRITICAL: Import unsloth FIRST for proper TRL patching
@@ -139,7 +158,3 @@ lora_config = LoraConfig(
 
 model = get_peft_model(base_model, lora_config)
 ```
-
-## Related Plugins
-
-- `bazzite-ai-ollama` - Ollama API operations for LLM inference

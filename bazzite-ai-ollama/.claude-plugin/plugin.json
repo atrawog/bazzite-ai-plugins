@@ -1,9 +1,0 @@
-{
-  "name": "bazzite-ai-ollama",
-  "description": "Ollama API operations for LLM inference, embeddings, and model management",
-  "version": "1.0.0",
-  "author": {
-    "name": "atrawog"
-  },
-  "repository": "https://github.com/atrawog/bazzite-ai"
-}

@@ -1,5 +1,5 @@
 ---
-name: python
+name: ollama
 description: |
   Official ollama Python library for LLM inference. Provides a clean,
   Pythonic interface for text generation, chat completion, embeddings,
@@ -267,5 +267,5 @@ Use when:
 
 ## Cross-References
 
-- `bazzite-ai-ollama:api` - Direct REST API access
-- `bazzite-ai-ollama:openai` - OpenAI-compatible interface
+- `bazzite-ai-jupyter:chat` - Direct REST API access
+- `bazzite-ai-jupyter:openai` - OpenAI-compatible interface

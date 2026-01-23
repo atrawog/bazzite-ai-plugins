@@ -1,7 +1,7 @@
 {
   "name": "bazzite-ai-jupyter",
-  "description": "ML/AI development workflows for JupyterLab - LangChain, RAG, fine-tuning, and model optimization",
-  "version": "1.0.0",
+  "description": "ML/AI development workflows for JupyterLab - Ollama API, LangChain, RAG, fine-tuning, and model optimization",
+  "version": "1.1.0",
   "author": {
     "name": "atrawog"
   },

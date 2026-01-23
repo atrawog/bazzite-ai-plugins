@@ -271,5 +271,5 @@ Use when:
 
 ## Cross-References
 
-- `bazzite-ai-ollama:python` - Using imported models
-- `bazzite-ai-ollama:api` - REST API for model management
+- `bazzite-ai-jupyter:ollama` - Using imported models
+- `bazzite-ai-jupyter:chat` - REST API for model management

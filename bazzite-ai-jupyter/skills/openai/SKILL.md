@@ -34,7 +34,7 @@ The OpenAI compatibility layer does **not** support:
 - Copy model (`/api/copy`)
 - Delete model (`/api/delete`)
 
-Use `bazzite-ai-ollama:api` or `bazzite-ai-ollama:python` for these operations.
+Use `bazzite-ai-jupyter:chat` or `bazzite-ai-jupyter:ollama` for these operations.
 
 ## Setup
 
@@ -253,5 +253,5 @@ Use when:
 
 ## Cross-References
 
-- `bazzite-ai-ollama:python` - Native Ollama library (more features)
-- `bazzite-ai-ollama:api` - Direct REST API access
+- `bazzite-ai-jupyter:ollama` - Native Ollama library (more features)
+- `bazzite-ai-jupyter:chat` - Direct REST API access

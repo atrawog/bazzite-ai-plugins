@@ -353,5 +353,5 @@ Use when:
 
 ## Cross-References
 
-- `bazzite-ai-ollama:api` - API for running inference
-- `bazzite-ai-ollama:python` - Python library for inference
+- `bazzite-ai-jupyter:chat` - API for running inference
+- `bazzite-ai-jupyter:ollama` - Python library for inference
