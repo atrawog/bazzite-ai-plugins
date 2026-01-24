@@ -128,7 +128,6 @@ ujust config shell update   # Update all configs from /etc/skel (with backup)
 |------|---------|
 | `~/.bashrc` | Bash shell configuration |
 | `~/.zshrc` | Zsh shell configuration |
-| `~/.config/starship.toml` | Starship prompt config |
 | `~/.config/ghostty/` | Ghostty terminal config |
 
 **Backup location:** `~/.config-backup-shell-YYYYMMDD_HHMMSS/`
@@ -306,6 +305,6 @@ Use when the user asks about:
 
 - "reset shell config", "restore bashrc", "default zshrc"
 
-- "starship not working", "prompt broken", "shell configuration"
+- "prompt broken", "shell configuration"
 
 - "sync shell from skeleton", "ghostty config"

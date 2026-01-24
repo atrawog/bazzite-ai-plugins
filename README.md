@@ -63,13 +63,22 @@ Skills for using Bazzite AI OS features via `ujust` commands:
 - **apptainer** - Apptainer/Singularity container management
 - **bootc** - Bootable container testing and management
 - **comfyui** - ComfyUI AI image generation server
-- **configure** - System configuration (services, GPU, etc.)
+- **config** - System configuration (services, GPU, shell, etc.)
+- **deploy** - Helm deployments to k3d clusters
+- **fiftyone** - FiftyOne dataset visualization
 - **install** - System package and tool installation
 - **jellyfin** - Jellyfin media server management
 - **jupyter** - JupyterLab server management
+- **k3d** - Lightweight Kubernetes clusters
+- **localai** - LocalAI OpenAI-compatible inference
 - **ollama** - Ollama LLM inference server
+- **openwebui** - Open WebUI chat interface
+- **pods** - Pod container management
+- **portainer** - Portainer container management UI
+- **record** - Terminal recording for documentation
 - **runners** - GitHub Actions self-hosted runners
-- **shell** - Shell configuration and customization
+- **tailscale** - Tailscale mesh VPN service exposure
+- **test** - Test suite commands
 - **vm** - Virtual machine management
 
 **Usage:**
@@ -77,7 +86,7 @@ Skills for using Bazzite AI OS features via `ujust` commands:
 ```bash
 /bazzite-ai:ollama     # Help with Ollama setup
 /bazzite-ai:jupyter    # Help with JupyterLab
-/bazzite-ai:configure  # System configuration guidance
+/bazzite-ai:config     # System configuration guidance
 ```
 
 ### bazzite-ai-dev (Developers)
@@ -88,13 +97,10 @@ Development tools and enforcement agents for Bazzite AI contributors:
 
 - **build** - OS image building with Podman
 - **clean** - Cleanup build artifacts and caches
-- **docs** - Documentation building and serving
-- **gh** - GitHub operations and authentication
-- **lint** - Code linting and formatting
-- **pods** - Container pod management
-- **test** - Overlay testing session management
-- **validate** - Validation commands
-- **vms** - VM and ISO image creation
+- **lfs** - Git LFS file management
+- **overlay** - Overlay testing session management
+- **record** - Terminal recording for documentation
+- **test** - Test commands and validation
 
 **Enforcement Agents:**
 
