@@ -48,7 +48,7 @@ The `build` command provides a unified interface for all bazzite-ai build operat
 | `jupyter` | `bazzite-ai-pod-jupyter` | JupyterLab + ML stack |
 | `ollama` | `bazzite-ai-pod-ollama` | LLM inference |
 | `comfyui` | `bazzite-ai-pod-comfyui` | Stable Diffusion UI |
-| `devops` | `bazzite-ai-pod-devops` | AWS/kubectl/Helm tools |
+| `sandbox` | `bazzite-ai-pod-sandbox` | AI + DevOps tools |
 | `githubrunner` | `bazzite-ai-pod-githubrunner` | CI/CD pipeline |
 
 ## Smart Cache Strategy
